@@ -1,0 +1,141 @@
+
+\documentclass[twoside,12pt]{article}
+%\documentclass[UTF8]{ctexart}
+\usepackage[heading=true]{ctex}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\usepackage{fancyhdr} % 页眉页脚
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{geometry}
+
+\geometry{
+  paper      = a4paper,
+  vmargin    = 2.54cm,
+  hmargin    = 3.17cm,
+  headheight = 0.75cm,
+  headsep    = 0.29cm,
+  footskip   = 0.79cm,
+}
+
+
+
+\pagestyle{fancy}
+
+%\firstpageno{1}
+
+\title{ }
+
+\author{罗浩铭\ PB21030838}
+
+
+\begin{document}
+
+\fancyhf{} % 清除所有页眉页脚
+\fancyfoot[C]{\thepage} % 设置右页脚为页码
+\fancyhead[l]{\footnotesize  }
+% 设置右页眉为章节标题 
+
+\renewcommand{\headrulewidth}{0pt} % 去页眉线
+
+\begin{center}
+    \textbf{\LARGE{深度学习实践大作业——iTransformer翻译报告}}\\
+    \vspace{0.2cm}
+    \large{罗浩铭\ PB21030838}
+\end{center}
+
+% 找一篇2021年以后的知名会议和期刊上发表的人工智能相关的文章，翻译其摘要与Introduction部分，写一篇翻译报告（附上原文与翻译后的中文）
+% 文章翻译正确，流畅，通顺，信达雅
+
+\section{文章基本信息}
+
+\begin{itemize}
+    \item 论文题目：iTransformer: Inverted Transformers Are Effective for Time Series Forecasting
+    \item 论文作者：Yong Liu, Tengge Hu, Haoran Zhang, Haixu Wu, Shiyu Wang, Lintao Ma, Mingsheng Long
+    \item 论文来源：ICLR 2024(在投，但在OpenReview已经拿到3个8分和一个6分，基本确定中会，参见https://openreview.net/forum?id=JePfAI8fah)
+    \item 论文链接：\url{https://arxiv.org/abs/2310.06625}
+    \item 论文官方实现：\url{https://github.com/thuml/iTransformer}（截至本报告完成时，已获得443颗星）
+\end{itemize}
+
+\section{摘要}
+\subsection{译文}
+
+\subsection{原文}
+The recent boom of linear forecasting models questions the ongoing passions in architectural modifications of Transformer-based forecasters. These forecasters leverage Transformers to model the global dependencies over temporal tokens of time series, with each token formed by multiple variates of the same timestamp. However, Transformer is challenged in forecasting series with larger lookback windows due to performance degradation and computation explosion. Besides, the unified embedding for each temporal token fuses multiple variates with potentially unaligned timestamps and distinct physical measurements, which may fail in learning variate-centric representations and result in meaningless attention maps. In this work, we reflect on the competent duties of Transformer components and repurpose the Transformer architecture without any adaptation on the basic components. We propose iTransformer that simply inverts the duties of the attention mechanism and the feed-forward network. Specifically, the time points of individual series are embedded into variate tokens which are utilized by the attention mechanism to capture multivariate correlations; meanwhile, the feed-forward network is applied for each variate token to learn nonlinear representations. The iTransformer model achieves consistent state-of-the-art on several real-world datasets, which further empowers the Transformer family with promoted performance, generalization ability across different variates, and better utilization of arbitrary lookback windows, making it a nice alternative as the fundamental backbone of time series forecasting.
+
+\section{Introduction部分}
+\subsection{译文}
+
+\subsection{原文}
+Transformer (Vaswani et al., 2017) has achieved tremendous success in natural language processing (Brown et al., 2020) and computer vision (Dosovitskiy et al., 2021), growing into the foundation model that follows the scaling law (Kaplan et al., 2020). Inspired by the immense success in extensive
+fields, Transformer with strong capabilities of depicting pairwise dependencies and extracting multi-level representations
+in sequences is emerging in time series forecasting (Li et al.,
+2021; Wu et al., 2021; Nie et al., 2023).
+However, researchers have recently begun to question the validity of Transformer-based forecasters, which typically embed
+multiple variates of the same timestamp into indistinguishable
+channels and apply attention on these temporal tokens to capture temporal dependencies. Considering the numerical but
+less semantic relationship among time points, researchers find
+that simple linear layers, which can be traced back to statistical
+forecasters (Box \& Jenkins, 1968), have exceeded complicated Transformers on both performance
+and efficiency (Zeng et al., 2023; Das et al., 2023). Meanwhile, ensuring the independence of variate
+and utilizing mutual information is ever more highlighted by recent research that explicitly models
+multivariate correlations to achieve accurate forecasting (Zhang & Yan, 2023; Ekambaram et al.,
+2023), but this goal can be hardly achieved without subverting the vanilla Transformer architecture.
+Considering the disputes of Transformer-based forecasters, we reflect on why Transformers perform
+even worse than linear models in time series forecasting while acting predominantly in many other
+fields. We notice that the existing structure of Transformer-based forecasters may be not suitable for
+multivariate time series forecasting. As shown on the top of Figure 2, it is notable that the points
+of the same time step that basically represent completely different physical meanings recorded by
+inconsistent measurements are embedded into one token with wiped-out multivariate correlations.
+And the token formed by a single time step can struggle to reveal beneficial information due to
+excessively local receptive field and time-unaligned events represented by simultaneous time points.
+Besides, while series variations can be greatly influenced by the sequence order, permutation-invariant attention mechanisms are improperly adopted on the temporal dimension (Zeng et al.,
+2023). Consequently, Transformer is weakened to capture essential series representations and portray
+multivariate correlations, limiting its capacity and generalization ability on diverse time series data.
+Concerning the potential risks of embedding multivariate points of a timestamp as a (temporal) token,
+we take an inverted view on time series and embed the whole time series of each variate independently
+into a (variate) token, the extreme case of Patching (Nie et al., 2023) that enlarges local receptive field.
+By inverting, the embedded token aggregates the global representations of series that can be more
+variate-centric and better leveraged by booming attention mechanisms for multivariate correlating.
+Meanwhile, the feed-forward network can be proficient enough to learn generalizable representations
+for distinct variates encoded from arbitrary lookback series and decoded to predict future series.
+Based on the above motivations, we believe it is not that Transformer is ineffective for time series
+forecasting, but rather it is improperly used. In this paper, we revisit the structure of Transformer and
+advocate iTransformer as a fundamental backbone for time series forecasting. Technically, we embed
+each time series as variate tokens, adopt the attention for multivariate correlations, and employ the
+feed-forward network for series representations. Experimentally, the proposed iTransformer achieves
+state-of-the-art performance on real-world forecasting benchmarks shown in Figure 1 and surprisingly
+tackles the pain points of Transformer-based forecasters. Our contributions lie in three aspects:
+\begin{itemize}
+    \item We reflect on the architecture of Transformer and refine that the competent capability of
+          native Transformer components on multivariate time series is underexplored.
+    \item We propose iTransformer that regards independent time series as tokens to capture multivariate correlations by self-attention and utilize layer normalization and feed-forward network
+          modules to learn better series-global representations for time series forecasting.
+    \item Experimentally, iTransformer achieves comprehensive state-of-the-art on real-world benchmarks. We extensively analyze the inverted modules and architecture choices, indicating a
+          promising direction for the future improvement of Transformer-based forecasters.
+\end{itemize}
+\end{document}
