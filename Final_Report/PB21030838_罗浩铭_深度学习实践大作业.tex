@@ -63,26 +63,67 @@
 \renewcommand{\headrulewidth}{0pt} % 去页眉线
 
 \begin{center}
-    \textbf{\LARGE{深度学习实践大作业——iTransformer}}\\
-    \vspace{0.2cm}
-    \large{罗浩铭\ PB21030838}
+  \textbf{\LARGE{深度学习实践大作业——iTransformer}}\\
+  \vspace{0.2cm}
+  \large{罗浩铭\ PB21030838}
 \end{center}
+% 无错别字，语句通顺，格式整齐，排版良好  （5分）
 
-\section{文章选择及介绍}
+\section{文章基本信息}
+
+\begin{itemize}
+  \item 论文题目：iTransformer: Inverted Transformers Are Effective for Time Series Forecasting
+  \item 论文作者：Yong Liu, Tengge Hu, Haoran Zhang, Haixu Wu, Shiyu Wang, Lintao Ma, Mingsheng Long
+  \item 论文来源：ICLR 2024(在投，但在OpenReview已经拿到3个8分和一个6分，基本确定中会，参见https://openreview.net/forum?id=JePfAI8fah)
+  \item 首发日期：2023年10月10日
+  \item 论文链接：\url{https://arxiv.org/abs/2310.06625}
+  \item 论文官方实现：\url{https://github.com/thuml/iTransformer}（截至本报告完成时，已获得443颗星）
+\end{itemize}
+
+
+
+\section{文章介绍及理解}
+% 简述对文章的理解   300-600字     （10分）
+
 我们选择的文章是，我们选择的文章是，我们选择的文章是，我们选择的文章是，我们选择的文章是，我们选择的文章是，我们选择的文章是，我们选择的文章是，
 
 \section{代码结构}
+% 对代码结构进行描述 300-1000字    （10分）
+
+代码以\verb |run.py|为入口，其拉起experiments部分中的主类，主类再调用data_provider、model（model再调用layers）、utils等部分的类，完成数据的读取、模型的构建、训练、测试等过程。
 
 
 \section{训练及测试过程}
+% 对训练和测试过程进行描述（各种超参），需含loss曲线的展示，对时间的描述等   500-1000字	（15分）
+
+我们同时使用百度的aistudio（每日4小时额度，单卡V100）和kaggle平台（每周30小时额度，单卡P100）进行训练。
+
 
 
 \section{复现结果}
+% 复现结果与文章所示结果的对比，并分析结果不同的可能的原因  500-1000字    （15分）
+\subsection{模型效果测试}
+
+
+
+\subsection{不同超参对模型效果的影响}
+
+
+
+\subsection{对优化效率的iFlashTransformer的测试}
+
+
+
 
 
 \section{感想}
+% 复现过程中的感悟、吐槽  （300-1000字） （5分）
+
+
 
 
 \section{探索性修改}
+% (非必须，奖励分) 对代码进行了探索性修改，描述修改经过，并报告实验结果   （5分）
+
 
 \end{document}

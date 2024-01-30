@@ -63,7 +63,7 @@
 \renewcommand{\headrulewidth}{0pt} % 去页眉线
 
 \begin{center}
-    \textbf{\LARGE{深度学习实践大作业——iTransformer翻译报告}}\\
+    \textbf{\LARGE{iTransformer论文翻译报告}}\\
     \vspace{0.2cm}
     \large{罗浩铭\ PB21030838}
 \end{center}
@@ -77,6 +77,7 @@
     \item 论文题目：iTransformer: Inverted Transformers Are Effective for Time Series Forecasting
     \item 论文作者：Yong Liu, Tengge Hu, Haoran Zhang, Haixu Wu, Shiyu Wang, Lintao Ma, Mingsheng Long
     \item 论文来源：ICLR 2024(在投，但在OpenReview已经拿到3个8分和一个6分，基本确定中会，参见https://openreview.net/forum?id=JePfAI8fah)
+    \item 首发日期：2023年10月10日
     \item 论文链接：\url{https://arxiv.org/abs/2310.06625}
     \item 论文官方实现：\url{https://github.com/thuml/iTransformer}（截至本报告完成时，已获得443颗星）
 \end{itemize}
@@ -103,7 +104,7 @@ that simple linear layers, which can be traced back to statistical
 forecasters (Box \& Jenkins, 1968), have exceeded complicated Transformers on both performance
 and efficiency (Zeng et al., 2023; Das et al., 2023). Meanwhile, ensuring the independence of variate
 and utilizing mutual information is ever more highlighted by recent research that explicitly models
-multivariate correlations to achieve accurate forecasting (Zhang & Yan, 2023; Ekambaram et al.,
+multivariate correlations to achieve accurate forecasting (Zhang \& Yan, 2023; Ekambaram et al.,
 2023), but this goal can be hardly achieved without subverting the vanilla Transformer architecture.
 Considering the disputes of Transformer-based forecasters, we reflect on why Transformers perform
 even worse than linear models in time series forecasting while acting predominantly in many other

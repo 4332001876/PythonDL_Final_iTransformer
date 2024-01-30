@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def RSE(pred, true):
+def RSE(pred, true): # Relative Squared Error, np.sqrt(MSE)/std
     return np.sqrt(np.sum((true - pred) ** 2)) / np.sqrt(np.sum((true - true.mean()) ** 2))
 
 

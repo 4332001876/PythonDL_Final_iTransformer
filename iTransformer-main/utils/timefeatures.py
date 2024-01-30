@@ -84,7 +84,7 @@ class WeekOfYear(TimeFeature):
     """Week of year encoded as value between [-0.5, 0.5]"""
 
     def __call__(self, index: pd.DatetimeIndex) -> np.ndarray:
-        return (index.isocalendar().week - 1) / 52.0 - 0.5
+        return (index.isocalendar().week - 1) / 52.0 - 0.5 # isocalendar()返回指定日期的年，第几周，周几这三个值
 
 
 def time_features_from_frequency_str(freq_str: str) -> List[TimeFeature]:

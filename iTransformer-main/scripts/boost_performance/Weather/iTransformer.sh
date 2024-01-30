@@ -1,7 +1,7 @@
 export CUDA_VISIBLE_DEVICES=2
 
-model_name=iTransformer
-#model_name=Transformer
+#model_name=iTransformer
+model_name=Transformer
 
 python -u run.py \
   --is_training 1 \
