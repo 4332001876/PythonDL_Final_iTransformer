@@ -95,7 +95,7 @@
 \section{文章介绍及理解}
 % 简述对文章的理解   300-600字     （10分）
 
-本文提出的iTransformer，即inverted Transformer，是一种新的基于Transformer的时间序列预测架构，它的做法其实非常简单：传统的transformer架构是将同一时间点的各变量建模为一个token (temporal token)，对变量维进行FFN计算，并对时间轴进行attention计算；而iTransformer则是将同一变量的序列建模为一个token (variate token)，对时间维进行FFN计算提取时序特征，并对变量轴进行attention计算从而提取各变量之间的关联。也就是说，它倒置了传统Transformer架构中对时间轴和变量轴的处理方式，这也是其名字由来。正是这样的简单改进，使得其在不修改任何底层模块的条件下，大幅提升了模型性能，使之在各大复杂时序预测任务中取得了大幅领先的SOTA效果。
+本文提出的iTransformer，即inverted Transformer，是一种新的基于Transformer~\citep{Transformer}的时间序列预测架构，它的做法其实非常简单：传统的Transformer架构是将同一时间点的各变量建模为一个token (temporal token)，对变量维进行FFN计算，并对时间轴进行attention计算；而iTransformer则是将同一变量的序列建模为一个token (variate token)，对时间维进行FFN计算提取时序特征，并对变量轴进行attention计算从而提取各变量之间的关联。也就是说，它倒置了传统Transformer架构中对时间轴和变量轴的处理方式，这也是其名字由来。正是这样的简单改进，使得其在不修改任何底层模块的条件下，大幅提升了模型性能，使之在各大复杂时序预测任务中取得了大幅领先的SOTA效果。
 
 虽然其做法简单，但是其背后蕴含着深刻的思想。
 
@@ -121,12 +121,17 @@
 
 代码的总体结构为：以\verb |run.py|为入口，其拉起experiments部分中的主类，主类再调用data\_provider、model（model再调用layers）、utils等部分的类，完成数据的读取、模型的构建、训练、测试等过程。
 
-下面分别介绍代码的各部分：
+下面自顶向底分别介绍代码的各部分：
 \begin{itemize}
-  \item \verb |run.py|：整个程序的入口，。
-
+  \item script: 用于运行训练和测试的脚本，其中定义好了论文里的各个实验的脚本代码，特别是提供了合适的训练参数，可以直接运行。
+  \item \verb |run.py|：整个程序的入口，用于接收命令行参数，并根据命令行参数，选择合适的实验类（是否是测试从部分变量的序列预测出全部变量的序列的实验），初始化后调用其训练、测试或预测函数，完成该次实验内容。
+  \item model: 里面定义了Transformer, iTransformer，以及Transformer变体（包括Reformer~\citep{kitaev2020reformer}, Informer~\citep{Informer}, Flowformer~\citep{wu2022flowformer}, Flashformer~\citep{dao2022flashattention}）及其inverted版本。
+  \item layers: 包含上述模型中的各个子模块，如attention及其各种改型, FFN, encoder, decoder, embedding (含原版的embedding方案和inverted的方案)等。
+  \item data\_provider: 用于根据实验配置信息，读取各个数据集的数据，并提供相应的Data Loader。
+  \item utils: 包含各种工具函数和类，如计算各种评价指标、loss的函数，提供attention mask的类、时间序列处理工具类及工具函数、学习率调节、早停等。
 \end{itemize}
 
+从Transformer到iTransformer的改动相当简单，只需要将Embedding层由\verb |DataEmbedding|换为\verb |DataEmbedding_inverted|，并相应地用permute调换维度，调整维度大小即可。
 
 \section{训练及测试过程}
 % 对训练和测试过程进行描述（各种超参），需含loss曲线的展示，对时间的描述等   500-1000字	（15分）
