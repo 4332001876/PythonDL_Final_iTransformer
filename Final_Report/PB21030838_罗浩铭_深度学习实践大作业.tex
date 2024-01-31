@@ -136,9 +136,13 @@
 \section{训练及测试过程}
 % 对训练和测试过程进行描述（各种超参），需含loss曲线的展示，对时间的描述等   500-1000字	（15分）
 
-我们同时使用百度的aistudio（每日4小时额度，单卡V100）和kaggle平台（每周30小时额度，单卡P100）进行训练。
+本次作业中，我使用了iTransformer的官方实现\url{https://github.com/thuml/iTransformer}来进行复现。代码在软件工程规范上做得很好，模块化程度高，API设计合理，使用和修改都十分方便，读起来也赏心悦目。由于代码提供了bash脚本，里面指定了各个数据集的测试配置及超参设置，因此我们可以很方便地对论文中结果进行复现。
 
-测试所用数据集与论文一致，如表\ref{tab:dataset}所示。
+我们同时使用百度的aistudio（每日4小时额度，单卡V100）和kaggle平台（每周30小时额度，单卡P100）进行训练。总共花费了大约40小时额度的算力来完成下面所述的全部测试。
+
+我们先用论文中提到的各数据集对iTransformer进行了测试，并将测试结果与原论文中的结果进行对比。测试所用数据集列表如表\ref{tab:dataset}所示。
+
+此后，我们对比了iTransformer与Transformer的性能，测试了iFlashTransformer的效率提升，以及对各种超参进行了测试。
 
 \begin{table}[thbp]
   \centering
@@ -183,6 +187,31 @@
   }
   \vspace{0pt}
 \end{table}
+
+我们以weather数据集下以96长度的输入序列预测96长度的输出序列为例（见表\ref{tab:hyperparams}）介绍我们训练时用的超参：
+\begin{table}[htbp]
+  \caption{}
+  \label{tab:hyperparams}
+  \vspace{5pt}
+  \centering
+  \begin{tabular}{|c|c|c|}
+    \toprule
+    超参名称     & 解释              & 超参值 \\
+    enc_layers   & Encoder层数       & 2      \\
+    dec_layers   & Decoder层数       & 1      \\
+    n_heads      & 多头注意力头数    & 8      \\
+    enc_in       & Encoder输入变量数 & 21     \\
+    dec_in       & Decoder输入变量数 & 21     \\
+    c_out        & 输出变量数        & 21     \\
+    d\_model     & Token维度         & 512    \\
+    d\_ff        & FFN维度           & 2048   \\
+    batch\_size  & Batch大小         & 128    \\
+    train_epochs & Epoch数           & 10     \\
+    lr           & 学习率            & 0.0001 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+由于Weather数据集较小，因此我们选用的Encoder层数仅为2，由于时间序列预测任务不需要很复杂的Decoder，因此Decoder层数仅为1。Encoder, Decoder输入变量数以及输出变量数与数据集保持一致即可。Token维度和FFN维度的设置默认如上。由于Weather数据集较小，单卡可以支持128的BatchSize，Epoch数为10，此类较大的模型学习率一般都设为0.0001。
 
 \section{复现结果}
 % 复现结果与文章所示结果的对比，并分析结果不同的可能的原因  500-1000字    （15分）
@@ -287,16 +316,13 @@
 
 
 
+\section{探索性修改}
+% (非必须，奖励分) 对代码进行了探索性修改，描述修改经过，并报告实验结果   （5分）
 
 
 \section{感想}
 % 复现过程中的感悟、吐槽  （300-1000字） （5分）
 
-
-
-
-\section{探索性修改}
-% (非必须，奖励分) 对代码进行了探索性修改，描述修改经过，并报告实验结果   （5分）
 
 
 \bibliography{dllab_final_report}
