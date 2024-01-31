@@ -252,6 +252,7 @@
 \end{table}
 而每次训练最多需要十个epoch，因此在各数据集上的训练时间在半分钟到半小时不等。
 
+\newpage
 \section{复现结果}
 % 复现结果与文章所示结果的对比，并分析结果不同的可能的原因  500-1000字    （15分）
 \subsection{模型效果测试}
@@ -299,7 +300,7 @@
       \setlength{\tabcolsep}{5.3pt}
       \begin{tabular}{c|c|cc|cc|cc|cc}
         \toprule
-        \multirow{2}{*}{Models}                                  & Prediction & \multicolumn{2}{c|}{ETTm1} & \multicolumn{2}{c|}{ETTm2} & \multicolumn{2}{c|}{ETTh1} & \multicolumn{2}{c|}{ETTh2}                                 \\
+        \multirow{2}{*}{Models}                                  & Prediction & \multicolumn{2}{c|}{ETTm1} & \multicolumn{2}{c|}{ETTm2} & \multicolumn{2}{c|}{ETTh1} & \multicolumn{2}{c}{ETTh2}                                 \\
         \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10}
                                                                  & Length     & MSE                        & MAE                        & MSE                        & MAE                        & MSE   & MAE   & MSE   & MAE   \\
         \midrule
@@ -327,7 +328,7 @@
       \setlength{\tabcolsep}{5.3pt}
       \begin{tabular}{c|c|cc|cc|cc|cc}
         \toprule
-        \multirow{2}{*}{Models}                                  & Prediction & \multicolumn{2}{c|}{PEMS03} & \multicolumn{2}{c|}{PEMS04} & \multicolumn{2}{c|}{PEMS07} & \multicolumn{2}{c|}{PEMS08}                                 \\
+        \multirow{2}{*}{Models}                                  & Prediction & \multicolumn{2}{c|}{PEMS03} & \multicolumn{2}{c|}{PEMS04} & \multicolumn{2}{c|}{PEMS07} & \multicolumn{2}{c}{PEMS08}                                 \\
         \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10}
                                                                  & Length     & MSE                         & MAE                         & MSE                         & MAE                         & MSE   & MAE   & MSE   & MAE   \\
         \midrule
@@ -361,7 +362,7 @@
   \centering
   \begin{tabular}{c|cc|cc|cc}
     \toprule
-    \multirow{2}{*}{组别} & \multicolumn{2}{c|}{旧结果} & \multicolumn{2}{c|}{新结果} & \multicolumn{2}{c|}{原论文结果}                         \\
+    \multirow{2}{*}{组别} & \multicolumn{2}{c|}{旧结果} & \multicolumn{2}{c|}{新结果} & \multicolumn{2}{c}{原论文结果}                         \\
     \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
                           & MSE                         & MAE                         & MSE                             & MAE   & MSE   & MAE   \\
     \midrule
@@ -382,7 +383,7 @@
   \centering
   \begin{tabular}{c|c|cc|cc}
     \toprule
-    \multirow{2}{*}{数据集}  & Prediction & \multicolumn{2}{c|}{iTransformer} & \multicolumn{2}{c|}{Transformer}                 \\
+    \multirow{2}{*}{数据集}  & Prediction & \multicolumn{2}{c|}{iTransformer} & \multicolumn{2}{c}{Transformer}                 \\
     \cmidrule(lr){3-4} \cmidrule(lr){5-6}
                              & Length     & MSE                               & MAE                              & MSE   & MAE   \\
     \midrule
@@ -459,6 +460,8 @@
   \label{tab:itransformer_vs_iflashtransformer}
   \vspace{5pt}
   \centering
+  \resizebox{\textwidth}{!}
+  {
   \begin{tabular}{c|c|ccc|ccc}
     \toprule
     \multirow{2}{*}{数据集}  & Prediction & \multicolumn{3}{c|}{iTransformer} & \multicolumn{3}{c}{iFlashTransformer}                                                   \\
@@ -472,11 +475,10 @@
     \cmidrule(lr){2-6}
                              & Avg        & \textbf{0.258}                    & \textbf{0.279}                        & 39s            & 0.263 & 0.283 & \textbf{14s}   \\
     \bottomrule
-    \bottomrule
   \end{tabular}
+  }
 \end{table}
 
-\newpage
 % \section{探索性修改}
 % (非必须，奖励分) 对代码进行了探索性修改，描述修改经过，并报告实验结果   （5分）
 
