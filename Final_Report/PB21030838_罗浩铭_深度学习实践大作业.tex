@@ -188,30 +188,69 @@
   \vspace{0pt}
 \end{table}
 
-我们以weather数据集下以96长度的输入序列预测96长度的输出序列为例（见表\ref{tab:hyperparams}）介绍我们训练时用的超参：
+我们以Weather数据集下输入96长度序列并输出96长度预测序列的任务为例（见表\ref{tab:hyperparams}）介绍我们训练时用的超参：
 \begin{table}[htbp]
-  \caption{}
+  \caption{典型的训练超参设置（以Weather数据集下输入96长度序列并输出96长度预测序列的任务为例）}
   \label{tab:hyperparams}
   \vspace{5pt}
   \centering
-  \begin{tabular}{|c|c|c|}
+  \begin{tabular}{ccc}
     \toprule
-    超参名称     & 解释              & 超参值 \\
-    enc_layers   & Encoder层数       & 2      \\
-    dec_layers   & Decoder层数       & 1      \\
-    n_heads      & 多头注意力头数    & 8      \\
-    enc_in       & Encoder输入变量数 & 21     \\
-    dec_in       & Decoder输入变量数 & 21     \\
-    c_out        & 输出变量数        & 21     \\
-    d\_model     & Token维度         & 512    \\
-    d\_ff        & FFN维度           & 2048   \\
-    batch\_size  & Batch大小         & 128    \\
-    train_epochs & Epoch数           & 10     \\
-    lr           & 学习率            & 0.0001 \\
+    超参名称      & 解释              & 超参值 \\
+    \midrule
+    enc\_layers   & Encoder层数       & 2      \\
+    dec\_layers   & Decoder层数       & 1      \\
+    n\_heads      & 多头注意力头数    & 8      \\
+    enc\_in       & Encoder输入变量数 & 21     \\
+    dec\_in       & Decoder输入变量数 & 21     \\
+    c\_out        & 输出变量数        & 21     \\
+    d\_model      & Token维度         & 512    \\
+    d\_ff         & FFN维度           & 2048   \\
+    batch\_size   & Batch大小         & 128    \\
+    train\_epochs & Epoch数           & 10     \\
+    lr            & 学习率            & 0.0001 \\
     \bottomrule
   \end{tabular}
 \end{table}
 由于Weather数据集较小，因此我们选用的Encoder层数仅为2，由于时间序列预测任务不需要很复杂的Decoder，因此Decoder层数仅为1。Encoder, Decoder输入变量数以及输出变量数与数据集保持一致即可。Token维度和FFN维度的设置默认如上。由于Weather数据集较小，单卡可以支持128的BatchSize，Epoch数为10，此类较大的模型学习率一般都设为0.0001。
+
+我们以Traffic数据集下输入96长度序列并输出96长度预测序列的任务为例（因其未早停），来展示典型的训练过程中的每个epoch的loss曲线（见图\ref{fig:loss}）：
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./pic/loss_plot.png}
+  \caption{典型的训练过程中的loss曲线（以Traffic数据集下输入96长度序列并输出96长度预测序列的任务为例）}
+  \label{fig:loss}
+\end{figure}
+
+可以看到，训练过程中，不管是training loss, validation loss或者是test loss曲线，它们都呈现下降趋势，并 最终接近收敛。
+
+在各个数据集中，取预测长度为96时（预测长度对训练时长有少许影响，但非主要因素），每个epoch的训练时长如表\ref{tab:time}所示：
+\begin{table}[htbp]
+  \caption{各数据集下预测长度为96时每个epoch的训练时长}
+  \label{tab:time}
+  \vspace{5pt}
+  \centering
+  \begin{tabular}{ccc}
+    \toprule
+    数据集       & 每个epoch训练时长 \\
+    \midrule
+    ETTm1        & 12s               \\
+    ETTm2        & 12s               \\
+    ETTh1        & 3s                \\
+    ETTh2        & 3s                \\
+    PEMS03       & 68s               \\
+    PEMS04       & 89s               \\
+    PEMS07       & 237s              \\
+    PEMS08       & 22s               \\
+    ECL          & 57s               \\
+    Exchange     & 5s                \\
+    Traffic      & 101s              \\
+    Weather      & 34s               \\
+    Solar-Energy & 31s               \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+而每次训练最多需要十个epoch，因此在各数据集上的训练时间在半分钟到半小时不等。
 
 \section{复现结果}
 % 复现结果与文章所示结果的对比，并分析结果不同的可能的原因  500-1000字    （15分）
