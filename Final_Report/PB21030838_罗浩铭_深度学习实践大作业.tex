@@ -7,6 +7,10 @@
 % modification to natbib citations
 \setcitestyle{authoryear,round,citesep={;},aysep={,},yysep={;}}
 
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage{multirow}
+
 \usepackage{listings}
 \usepackage{color}
 
@@ -96,7 +100,7 @@
 \section{代码结构}
 % 对代码结构进行描述 300-1000字    （10分）
 
-代码以\verb |run.py|为入口，其拉起experiments部分中的主类，主类再调用data_provider、model（model再调用layers）、utils等部分的类，完成数据的读取、模型的构建、训练、测试等过程。
+代码以\verb |run.py|为入口，其拉起experiments部分中的主类，主类再调用data\_provider、model（model再调用layers）、utils等部分的类，完成数据的读取、模型的构建、训练、测试等过程。
 
 
 \section{训练及测试过程}
@@ -104,12 +108,117 @@
 
 我们同时使用百度的aistudio（每日4小时额度，单卡V100）和kaggle平台（每周30小时额度，单卡P100）进行训练。
 
+测试所用数据集与论文一致，如表\ref{tab:dataset}所示。
 
+\begin{table}[thbp]
+  \centering
+  \vspace{0pt}
+  \caption{数据集描述，\emph{Dim}代表时间序列变量数，\emph{Dataset Size}以 (Train, Validation, Test)的形式表示，\emph{Prediction Length}表示各预测序列长度的设定，\emph{Frequency} 表示时间序列的采样时间间隔}\label{tab:dataset}
+  \vskip 0.15in
+  \resizebox{\textwidth}{!}
+  {
+    \begin{threeparttable}
+      \begin{small}
+        \renewcommand{\multirowsetup}{\centering}
+        \setlength{\tabcolsep}{4.5pt}
+        \begin{tabular}{l|c|c|c|c|c}
+          \toprule
+          Dataset               & Dim & Prediction Length                     & Dataset Size                          & Frequency & Information                    \\
+          \toprule
+          \update{ETTh1, ETTh2} & 7   & \scalebox{0.8}{\{96, 192, 336, 720\}} & \scalebox{0.8}{(8545, 2881, 2881)}    & Hourly    & \scalebox{1.0}{Electricity}    \\
+          \midrule
+          \update{ETTm1, ETTm2} & 7   & \scalebox{0.8}{\{96, 192, 336, 720\}} & \scalebox{0.8}{(34465, 11521, 11521)} & 15min     & \scalebox{1.0}{Electricity}    \\
+          \midrule
+          \update{Exchange}     & 8   & \scalebox{0.8}{\{96, 192, 336, 720\}} & \scalebox{0.8}{(5120, 665, 1422)}     & Daily     & \scalebox{1.0}{Economy}        \\
+          \midrule
+          Weather               & 21  & \scalebox{0.8}{\{96, 192, 336, 720\}} & \scalebox{0.8}{(36792, 5271, 10540)}  & 10min     & \scalebox{1.0}{Weather}        \\
+          \midrule
+          ECL                   & 321 & \scalebox{0.8}{\{96, 192, 336, 720\}} & \scalebox{0.8}{(18317, 2633, 5261)}   & Hourly    & \scalebox{1.0}{Electricity}    \\
+          \midrule
+          Traffic               & 862 & \scalebox{0.8}{\{96, 192, 336, 720\}} & \scalebox{0.8}{(12185, 1757, 3509)}   & Hourly    & \scalebox{1.0}{Transportation} \\
+          \midrule
+          Solar-Energy          & 137 & \scalebox{0.8}{\{96, 192, 336, 720\}} & \scalebox{0.8}{(36601, 5161, 10417)}  & 10min     & \scalebox{1.0}{Energy}         \\
+          \midrule
+          \update{PEMS03}       & 358 & \scalebox{0.8}{\{12, 24, 48, 96\}}    & \scalebox{0.8}{(15617,5135,5135)}     & 5min      & \scalebox{1.0}{Transportation} \\
+          \midrule
+          \update{PEMS04}       & 307 & \scalebox{0.8}{\{12, 24, 48, 96\}}    & \scalebox{0.8}{(10172,3375,281)}      & 5min      & \scalebox{1.0}{Transportation} \\
+          \midrule
+          \update{PEMS07}       & 883 & \scalebox{0.8}{\{12, 24, 48, 96\}}    & \scalebox{0.8}{(16911,5622,468)}      & 5min      & \scalebox{1.0}{Transportation} \\
+          \midrule
+          \update{PEMS08}       & 170 & \scalebox{0.8}{\{12, 24, 48, 96\}}    & \scalebox{0.8}{(10690,3548,265)}      & 5min      & \scalebox{1.0}{Transportation} \\
+          \bottomrule
+        \end{tabular}
+      \end{small}
+    \end{threeparttable}
+  }
+  \vspace{0pt}
+\end{table}
 
 \section{复现结果}
 % 复现结果与文章所示结果的对比，并分析结果不同的可能的原因  500-1000字    （15分）
 \subsection{模型效果测试}
-
+\begin{table}[htbp]
+  \caption{}
+  \label{tab:ablation}
+  \vspace{5pt}
+  \centering
+  \resizebox{\textwidth}{!}
+  {
+    \begin{small}
+      \renewcommand{\multirowsetup}{\centering}
+      \setlength{\tabcolsep}{5.3pt}
+      \begin{tabular}{c|c|cc|cc|cc|cc|cc}
+        \toprule
+        \multirow{2}{*}{Models}                                  & Prediction & \multicolumn{2}{c|}{ECL} & \multicolumn{2}{c|}{Exchange} & \multicolumn{2}{c|}{Traffic} & \multicolumn{2}{c|}{Weather} & \multicolumn{2}{c}{Solar-Energy}                                         \\
+        \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+                                                                 & Length     & MSE                      & MAE                           & MSE                          & MAE                          & MSE                              & MAE   & MSE   & MAE   & MSE   & MAE   \\
+        \midrule
+        \multirow{5}{*}{\textbf{iTransformer (Our Replication)}} & 96         & 0.147                    & 0.239                         & 0.086                        & 0.206                        & 0.393                            & 0.269 & 0.176 & 0.216 & 0.208 & 0.243 \\
+                                                                 & 192        & 0.168                    & 0.259                         & 0.180                        & 0.304                        & 0.413                            & 0.277 & 0.225 & 0.257 & 0.239 & 0.263 \\
+                                                                 & 336        & 0.178                    & 0.270                         & 0.338                        & 0.422                        & 0.425                            & 0.283 & 0.281 & 0.299 &       &       \\
+                                                                 & 720        & 0.210                    & 0.300                         & 0.853                        & 0.696                        & 0.459                            & 0.299 & 0.358 & 0.350 &       &       \\
+        \cmidrule(lr){2-12}
+                                                                 & Avg        & 0.176                    & 0.267                         & 0.364                        & 0.407                        & 0.423                            & 0.282 & 0.260 & 0.281 &       &       \\
+        \midrule
+        \multirow{5}{*}{\textbf{iTransformer}}                   & 96         & 0.148                    & 0.240                         & 0.086                        & 0.206                        & 0.395                            & 0.268 & 0.174 & 0.214 & 0.203 & 0.237 \\
+                                                                 & 192        & 0.162                    & 0.253                         & 0.177                        & 0.299                        & 0.417                            & 0.276 & 0.221 & 0.254 & 0.233 & 0.261 \\
+                                                                 & 336        & 0.178                    & 0.269                         & 0.331                        & 0.417                        & 0.433                            & 0.283 & 0.278 & 0.296 & 0.248 & 0.273 \\
+                                                                 & 720        & 0.225                    & 0.317                         & 0.847                        & 0.691                        & 0.467                            & 0.302 & 0.358 & 0.349 & 0.249 & 0.275 \\
+        \cmidrule(lr){2-12}
+                                                                 & Avg        & 0.178                    & 0.270                         & 0.360                        & 0.403                        & 0.428                            & 0.282 & 0.258 & 0.279 & 0.233 & 0.262 \\
+        \bottomrule
+      \end{tabular}
+    \end{small}
+  }
+  \resizebox{\textwidth}{!}
+  {
+    \begin{small}
+      \renewcommand{\multirowsetup}{\centering}
+      \setlength{\tabcolsep}{5.3pt}
+      \begin{tabular}{c|c|cc|cc|cc|cc|cc}
+        \toprule
+        \multirow{2}{*}{Models}                                  & Prediction & \multicolumn{2}{c|}{ECL} & \multicolumn{2}{c|}{Exchange} & \multicolumn{2}{c|}{Traffic} & \multicolumn{2}{c|}{Weather} & \multicolumn{2}{c}{Solar-Energy}                                         \\
+        \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+                                                                 & Length     & MSE                      & MAE                           & MSE                          & MAE                          & MSE                              & MAE   & MSE   & MAE   & MSE   & MAE   \\
+        \midrule
+        \multirow{5}{*}{\textbf{iTransformer (Our Replication)}} & 96         & 0.148                    & 0.240                         & 0.086                        & 0.206                        & 0.395                            & 0.268 & 0.174 & 0.214 & 0.203 & 0.237 \\
+                                                                 & 192        & 0.162                    & 0.253                         & 0.177                        & 0.299                        & 0.417                            & 0.276 & 0.221 & 0.254 & 0.233 & 0.261 \\
+                                                                 & 336        & 0.178                    & 0.269                         & 0.331                        & 0.417                        & 0.433                            & 0.283 & 0.278 & 0.296 & 0.248 & 0.273 \\
+                                                                 & 720        & 0.225                    & 0.317                         & 0.847                        & 0.691                        & 0.467                            & 0.302 & 0.358 & 0.349 & 0.249 & 0.275 \\
+        \cmidrule(lr){2-12}
+                                                                 & Avg        & 0.178                    & 0.270                         & 0.360                        & 0.403                        & 0.428                            & 0.282 & 0.258 & 0.279 & 0.233 & 0.262 \\
+        \midrule
+        \multirow{5}{*}{\textbf{iTransformer}}                   & 96         & 0.148                    & 0.240                         & 0.086                        & 0.206                        & 0.395                            & 0.268 & 0.174 & 0.214 & 0.203 & 0.237 \\
+                                                                 & 192        & 0.162                    & 0.253                         & 0.177                        & 0.299                        & 0.417                            & 0.276 & 0.221 & 0.254 & 0.233 & 0.261 \\
+                                                                 & 336        & 0.178                    & 0.269                         & 0.331                        & 0.417                        & 0.433                            & 0.283 & 0.278 & 0.296 & 0.248 & 0.273 \\
+                                                                 & 720        & 0.225                    & 0.317                         & 0.847                        & 0.691                        & 0.467                            & 0.302 & 0.358 & 0.349 & 0.249 & 0.275 \\
+        \cmidrule(lr){2-12}
+                                                                 & Avg        & 0.178                    & 0.270                         & 0.360                        & 0.403                        & 0.428                            & 0.282 & 0.258 & 0.279 & 0.233 & 0.262 \\
+        \bottomrule
+      \end{tabular}
+    \end{small}
+  }
+\end{table}
 
 
 \subsection{不同超参对模型效果的影响}
