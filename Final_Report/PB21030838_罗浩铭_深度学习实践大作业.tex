@@ -232,21 +232,21 @@
   \centering
   \begin{tabular}{ccc}
     \toprule
-    数据集       & 每个epoch训练时长 \\
+    数据集       & 训练时长/epoch \\
     \midrule
-    ETTm1        & 12s               \\
-    ETTm2        & 12s               \\
-    ETTh1        & 3s                \\
-    ETTh2        & 3s                \\
-    PEMS03       & 68s               \\
-    PEMS04       & 89s               \\
-    PEMS07       & 237s              \\
-    PEMS08       & 22s               \\
-    ECL          & 57s               \\
-    Exchange     & 5s                \\
-    Traffic      & 101s              \\
-    Weather      & 34s               \\
-    Solar-Energy & 31s               \\
+    ETTm1        & 12s            \\
+    ETTm2        & 12s            \\
+    ETTh1        & 3s             \\
+    ETTh2        & 3s             \\
+    PEMS03       & 68s            \\
+    PEMS04       & 89s            \\
+    PEMS07       & 237s           \\
+    PEMS08       & 22s            \\
+    ECL          & 57s            \\
+    Exchange     & 5s             \\
+    Traffic      & 101s           \\
+    Weather      & 34s            \\
+    Solar-Energy & 31s            \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -453,7 +453,28 @@
 \end{table}
 
 \subsection{对优化效率的iFlashTransformer的测试}
-
+我们对比了iTransformer与iFlashTransformer的性能和效率，测试结果如表\ref{tab:itransformer_vs_iflashtransformer}所示：
+\begin{table}[htbp]
+  \caption{\small{iTransformer与iFlashTransformer的性能对比}}
+  \label{tab:itransformer_vs_iflashtransformer}
+  \vspace{5pt}
+  \centering
+  \begin{tabular}{c|c|ccc|ccc}
+    \toprule
+    \multirow{2}{*}{数据集}  & Prediction & \multicolumn{3}{c|}{iTransformer} & \multicolumn{3}{c}{iFlashTransformer}                                                   \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6}
+                             & Length     & MSE                               & MAE                                   & 训练时长/epoch & MSE   & MAE   & 训练时长/epoch \\
+    \midrule
+    \multirow{5}{*}{Weather} & 96         & \textbf{0.174}                    & \textbf{0.214}                        & 34s            & 0.181 & 0.222 & \textbf{13s}   \\
+                             & 192        & \textbf{0.221}                    & \textbf{0.254}                        & 36s            & 0.228 & 0.260 & \textbf{14s}   \\
+                             & 336        & \textbf{0.278}                    & \textbf{0.296}                        & 41s            & 0.283 & 0.300 & \textbf{14s}   \\
+                             & 720        & \textbf{0.358}                    & \textbf{0.349}                        & 45s            & 0.360 & 0.351 & \textbf{15s}   \\
+    \cmidrule(lr){2-6}
+                             & Avg        & \textbf{0.258}                    & \textbf{0.279}                        & 39s            & 0.263 & 0.283 & \textbf{14s}   \\
+    \bottomrule
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 
 \section{探索性修改}
