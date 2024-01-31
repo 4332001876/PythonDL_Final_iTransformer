@@ -3,6 +3,10 @@
 %\documentclass[UTF8]{ctexart}
 \usepackage[heading=true]{ctex}
 
+\RequirePackage{natbib}
+% modification to natbib citations
+\setcitestyle{authoryear,round,citesep={;},aysep={,},yysep={;}}
+
 \usepackage{listings}
 \usepackage{color}
 
@@ -42,7 +46,9 @@
   footskip   = 0.79cm,
 }
 
-
+\newcommand{\update}[1]{{\textcolor{black}{#1}}}
+\newcommand{\boldres}[1]{{\textbf{\textcolor{red}{#1}}}}
+\newcommand{\secondres}[1]{{\underline{\textcolor{blue}{#1}}}}
 
 \pagestyle{fancy}
 
@@ -72,7 +78,7 @@
 \section{文章基本信息}
 
 \begin{itemize}
-  \item 论文题目：iTransformer: Inverted Transformers Are Effective for Time Series Forecasting
+  \item 论文题目：iTransformer: Inverted Transformers Are Effective for Time Series Forecasting~\citep{itransformer}
   \item 论文作者：Yong Liu, Tengge Hu, Haoran Zhang, Haixu Wu, Shiyu Wang, Lintao Ma, Mingsheng Long
   \item 论文来源：ICLR 2024(在投，但在OpenReview已经拿到3个8分和一个6分，基本确定中会，参见https://openreview.net/forum?id=JePfAI8fah)
   \item 首发日期：2023年10月10日
@@ -125,5 +131,10 @@
 \section{探索性修改}
 % (非必须，奖励分) 对代码进行了探索性修改，描述修改经过，并报告实验结果   （5分）
 
+
+\bibliography{dllab_final_report}
+\bibliographystyle{iclr2024_conference}
+
+\vfill
 
 \end{document}

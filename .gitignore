@@ -1,3 +1,6 @@
 *.pdf
 
 tmp/
+
+# 反向匹配
+!Final_Report/pic/*
