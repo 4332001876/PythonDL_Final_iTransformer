@@ -91,7 +91,7 @@
 
 \section{摘要}
 \subsection{译文}
-近年来，线性时间序列预测模型迅速兴起，这对此前人们一直热衷的路线——改进基于Transformer的预测模型架构——提出了质疑。这些预测器利用Transformer来将时间序列中同一时间点的所有变量值建模为temporal tokens，由此来捕捉各时间点的变量之间的全局依赖关系。然而，Transformer架构的模型在以更长的历史序列为输入时，会遭遇性能下降与计算量剧增的挑战。此外，对于每个temporal token融合的多个变量，它们可能具有不同物理意义，采集时间可能并不对齐，且尺度可能差异较大，这将使得模型无法学习到以变量为中心的表征，并使得模型学习到无意义的注意力矩阵。在这项工作中，我们重新思考了Transformer组件在整个架构中的用途和地位，并在不修改任何底层组件的情况下提出了我们的新架构。我们提出了\textbf{iTransformer}，它简单地互换注意力机制和FFN作用的维度。具体来说，它将同一个变量的序列建模为variate tokens，并在此之上使用注意力机制来捕捉变量之间的联系；同时，它对各variate tokens使用FFN来获取其非线性表示。我们的iTransformer架构在各大富有挑战的真实世界数据集中都取得了SOTA的效果，增强了整个Transformer系列的性能、在不同变量间的泛化能力以及对任意输入序列长度的更好利用，这使其成为时间序列预测任务中一个强有力的backbone竞争方案。
+近年来，线性时间序列预测模型的迅速兴起，对此前人们一直热衷的路线——改进基于Transformer的预测器架构——提出了质疑。这些预测器利用Transformer来将时间序列中同一时刻下的多个变量值建模为temporal tokens，由此来捕捉时间上的全局依赖关系。然而，Transformer架构的模型在处理更长的历史观测序列的输入时，会遭遇性能下降与计算量剧增的挑战。此外，对于每个temporal token融合的多个变量，它们可能具有不同物理意义，采集时间可能并不对齐，且尺度可能差异较大，这将使得模型无法学习到以变量为中心的表征，并使得模型容易学习到无意义的注意力图。在这项工作中，我们重新思考了Transformer组件在整个架构中的用途和地位，并在不修改任何底层组件的情况下提出了我们的新架构。我们提出了\textbf{iTransformer}，它简单地互换注意力机制和FFN作用的维度。具体来说，它将同一个变量的序列建模为variate tokens，并在此之上使用注意力机制来捕捉变量之间的联系；同时，它使用FFN对各variate tokens进行逐层编码，来获取其非线性表示，并最终解码为对未来序列的预测结果。我们的iTransformer架构在各大富有挑战的真实世界数据集中都取得了SOTA的效果，增强了整个Transformer系列的性能，提高了它们于不同变量间的泛化能力，并使得它们可以对任意长度的输入序列进行更好利用。这使得iTransformer成为时间序列预测任务中一个强有力的backbone竞争方案。
 
 \subsection{原文}
 The recent boom of linear forecasting models questions the ongoing passion for architectural modifications of Transformer-based forecasters. These forecasters leverage Transformers to model the global dependencies over \emph{temporal tokens} of time series, with each token formed by multiple variates of the same timestamp. However, Transformers are challenged in forecasting series with larger lookback windows due to performance degradation and computation explosion. Besides, the embedding for each temporal token fuses multiple variates \update{that represent potential delayed events and distinct physical measurements}, which may fail in learning variate-centric representations and result in meaningless attention maps. In this work, we reflect on the competent duties of Transformer components and repurpose the Transformer architecture without any modification to the basic components. We propose \textbf{iTransformer} that simply \update{applies the attention and feed-forward network on the inverted dimensions}. Specifically, the time points of individual series are embedded into \emph{variate tokens} which are utilized by the attention mechanism to capture multivariate correlations; meanwhile, the feed-forward network is applied for each variate token to learn nonlinear representations. The iTransformer model achieves state-of-the-art on challenging real-world datasets, which further empowers the Transformer family with promoted performance, generalization ability across different variates, and better utilization of arbitrary lookback windows, making it a nice alternative as the fundamental backbone of time series forecasting.
@@ -110,11 +110,11 @@ The recent boom of linear forecasting models questions the ongoing passion for a
   \vspace{-14pt}
 \end{figure}
 
-Transformer~\citep{Transformer}架构已经在自然语言处理~\citep{brown2020language}和计算机视觉~\citep{dosovitskiy2020image}领域取得了巨大的成功，成为了遵循scaling law~\citep{kaplan2020scaling}的基础模型。受其在广泛领域取得的巨大成功的启发，同时因其强大的刻画成对依赖关系和提取序列多层次表征的能力，Transformer在时间序列预测领域正在兴起。~\citep{Informer, Autoformer, PatchTST}
+Transformer~\citep{Transformer}架构已经在自然语言处理~\citep{brown2020language}和计算机视觉~\citep{dosovitskiy2020image}领域取得了巨大的成功，成为了遵循scaling law~\citep{kaplan2020scaling}的基础模型。受其在广泛领域取得的巨大成功的启发，同时因其强大的刻画依赖关系和提取序列多层次表征的能力，Transformer在时间序列预测领域正在兴起。~\citep{Informer, Autoformer, PatchTST}
 
-然而，研究者们最近开始质疑基于Transformer的预测模型的有效性，这些模型通常将同一时间戳的多个变量嵌入到不可区分的通道中成为temporal tokens，并在这些temporal tokens上应用注意力机制来捕捉时间上的依赖关系。考虑到各时间点之间的关系更多地是数值上的，而非语义上的，研究者们发现简单的线性层（可以追溯到基于统计的预测器~\citep{box1968some}）能够达到超过复杂的Transformer的性能与效率~\citep{DLinear, das2023long}。与此同时，最近的研究更加强调保证变量之间的独立性并使用它们之间的互信息，而非显式地对各变量之间的关系进行建模，以实现准确的预测~\citep{DLinear, das2023long}。但是如果不颠覆原来的Transformer架构，这一目标很难实现。
+然而，研究者们最近开始质疑基于Transformer的预测模型的有效性，这些模型通常将同一时间戳的多个变量杂糅到无法区分的特征通道中成为temporal tokens，并在这些temporal tokens上应用注意力机制来捕捉时间上的依赖关系。考虑到各时刻之间变量的关系更多地是数值上的，而非语义上的，研究者们发现简单的线性层（可以追溯到基于统计的预测器~\citep{box1968some}）能够达到超过复杂的Transformer的性能与效率~\citep{DLinear, das2023long}。与此同时，最近的研究更加强调保证变量之间的独立性并使用它们之间的互信息，而非显式地对各变量之间的关系进行建模，以实现准确的预测~\citep{DLinear, das2023long}。但是如果不颠覆原来的Transformer架构，这一目标很难实现。
 
-考虑到对基于Transformer的预测器的争议，我们反思了为何在其他领域表现出色的Transformer，却在时间序列预测任务中表现得甚至不如线性模型。我们注意到，基于Transformer的预测器的现有架构可能不适合用于多变量时间序列预测。如图~\ref{fig:motivation_cn}顶部所示，相同时间步的变量值实际上代表着完全不同的物理意义，以不一致的量纲记录，而这些变量值却被混在一个token中，抹去了多变量之间的关联。而且，由单个时间步组成的token可能由于过于局部的感受野或同一时间点内包含不同时间的信息而难以提取出有效信息。此外，由于序列的变化与序列顺序息息相关，因此顺序无关的注意力机制不适用于时间维度上~\citep{DLinear}。因此，Transformer在捕捉序列表征及描绘多变量间关联方面的能力较弱，限制了其在各种时间序列数据上的表现和泛化能力。
+考虑到对基于Transformer的预测器的争议，我们反思了为何在其他领域表现出色的Transformer，却在时间序列预测任务中表现得甚至不如线性模型。我们注意到，基于Transformer的预测器的现有架构可能不适合用于多变量时间序列预测。如图~\ref{fig:motivation_cn}顶部所示，相同时刻的变量值实际上代表着完全不同的物理意义，并通常有着不同的测量单位，而这些变量值却被杂糅在一个token中，抹去了多变量之间的关联。而且，由单个时间步组成的token可能由于过小的感受野或同一时间点内混杂着不同时间的信息而难以提取出有效信息。此外，由于序列的变化与序列顺序息息相关，因此顺序无关的注意力机制不适合用于时间维度上~\citep{DLinear}。因此，Transformer在捕捉序列表征及描绘多变量间关联方面的能力较弱，限制了其在各种时间序列数据上的表现和泛化能力。
 
 考虑到将一个时间戳内的多个变量值建模到一个token的潜在问题，我们采取了一个\emph{倒置的视角}来看待时间序列，并将每个变量的整条时间序列建模到一个token中，这相当于是Patching~\citep{PatchTST}扩大局部感受野后的极端情况。通过倒置，每一个token融合了序列的全局表征，从而使得表征更多地以变量为中心，并且使得可扩展性很强的注意力机制可以更好地捕捉多变量之间的关联。同时，前馈网络（FFN）在编码得到各个变量各种长度的历史序列的全局表征以及解码得到预测序列等方面有着足够好的表现。
 
@@ -138,7 +138,7 @@ Transformer~\citep{Transformer}架构已经在自然语言处理~\citep{brown202
 \begin{itemize}
   \item 我们反思了Transformer的架构，并且认为原生的Transformer组件在处理多变量时间序列上的能力还没有被充分挖掘。
   \item 我们提出了iTransformer，它将独立的时间序列建模为token，使用注意力机制来捕捉多变量之间的关联，并使用层归一化和前馈网络模块来学习更好的序列表征。
-  \item 从实验结果上来看，iTransformer在各真实世界的预测任务benchmark上取得了SOTA的表现，并且我们对倒置的模块和架构选择进行了广泛的分析，指明了基于Transformer的预测器在未来改进中一个有希望的方向。
+  \item 从实验结果上来看，iTransformer在各真实世界的预测任务benchmark上取得了SOTA的表现，并且我们对倒置的模块和架构选择进行了广泛的分析，指明了基于Transformer的预测器在未来改进中的一个有希望的方向。
 \end{itemize}
 
 \subsection{原文}
