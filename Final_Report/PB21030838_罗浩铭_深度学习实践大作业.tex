@@ -147,7 +147,7 @@
 \begin{table}[thbp]
   \centering
   \vspace{0pt}
-  \caption{数据集描述，\emph{Dim}代表时间序列变量数，\emph{Dataset Size}以 (Train, Validation, Test)的形式表示，\emph{Prediction Length}表示各预测序列长度的设定，\emph{Frequency} 表示时间序列的采样时间间隔}\label{tab:dataset}
+  \caption{\small{数据集描述，\emph{Dim}代表时间序列变量数，\emph{Dataset Size}以 (Train, Validation, Test)的形式表示，\emph{Prediction Length}表示各预测序列长度的设定，\emph{Frequency} 表示时间序列的采样时间间隔}\label{tab:dataset}}
   \vskip 0.15in
   \resizebox{\textwidth}{!}
   {
@@ -190,7 +190,7 @@
 
 我们以Weather数据集下输入96长度序列并输出96长度预测序列的任务为例（见表\ref{tab:hyperparams}）介绍我们训练时用的超参：
 \begin{table}[htbp]
-  \caption{典型的训练超参设置（以Weather数据集下输入96长度序列并输出96长度预测序列的任务为例）}
+  \caption{\small{典型的训练超参设置（以Weather数据集下输入96长度序列并输出96长度预测序列的任务为例）}}
   \label{tab:hyperparams}
   \vspace{5pt}
   \centering
@@ -198,14 +198,14 @@
     \toprule
     超参名称      & 解释              & 超参值 \\
     \midrule
-    enc\_layers   & Encoder层数       & 2      \\
+    enc\_layers   & Encoder层数       & 3      \\
     dec\_layers   & Decoder层数       & 1      \\
     n\_heads      & 多头注意力头数    & 8      \\
     enc\_in       & Encoder输入变量数 & 21     \\
     dec\_in       & Decoder输入变量数 & 21     \\
     c\_out        & 输出变量数        & 21     \\
     d\_model      & Token维度         & 512    \\
-    d\_ff         & FFN维度           & 2048   \\
+    d\_ff         & FFN维度           & 512    \\
     batch\_size   & Batch大小         & 128    \\
     train\_epochs & Epoch数           & 10     \\
     lr            & 学习率            & 0.0001 \\
@@ -218,7 +218,7 @@
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.8\textwidth]{./pic/loss_plot.png}
-  \caption{典型的训练过程中的loss曲线（以Traffic数据集下输入96长度序列并输出96长度预测序列的任务为例）}
+  \caption{\small{典型的训练过程中的loss曲线（以Traffic数据集下输入96长度序列并输出96长度预测序列的任务为例）}}
   \label{fig:loss}
 \end{figure}
 
@@ -226,7 +226,7 @@
 
 在各个数据集中，取预测长度为96时（预测长度对训练时长有少许影响，但非主要因素），每个epoch的训练时长如表\ref{tab:time}所示：
 \begin{table}[htbp]
-  \caption{各数据集下预测长度为96时每个epoch的训练时长}
+  \caption{\small{各数据集下预测长度为96时每个epoch的训练时长}}
   \label{tab:time}
   \vspace{5pt}
   \centering
@@ -260,7 +260,7 @@
 \newpage
 
 \begin{table}[htbp]
-  \caption{复现结果与原论文结果对比（平均结果指四种预测长度的结果取平均）}
+  \caption{\small{复现结果与原论文结果对比（平均结果指四种预测长度的结果取平均）}}
   \label{tab:result}
   \vspace{5pt}
   \centering
@@ -355,7 +355,7 @@
 进一步检验，我们发现，脚本中所给的PEMS数据集的训练参数中，学习率大都异常地高，上述预测误差异常的组别，无一例外都采用了默认值5倍或10倍的学习率。将学习率调回默认值0.0001后，我们对上述的梯度爆炸的三个组别重新训练，得到的结果如表\ref{tab:result_fix}所示：
 
 \begin{table}[htbp]
-  \caption{对梯度爆炸的组别以默认学习率0.0001进行重新训练得到的结果}
+  \caption{\small{对梯度爆炸的组别以默认学习率0.0001进行重新训练得到的结果}}
   \label{tab:result_fix}
   \vspace{5pt}
   \centering
@@ -373,10 +373,84 @@
 \end{table}
 
 可以看到，得到的结果虽明显偏高，但已经接近正常值。这说明官方仓库中关于PEMS数据集的训练脚本的参数可能与原论文中用于实验的参数不同。
+\subsection{iTransformer与Transformer的性能对比}
+我们对比了iTransformer与Transformer的性能，测试结果如表\ref{tab:itransformer_vs_transformer}所示：
+\begin{table}[htbp]
+  \caption{\small{iTransformer与Transformer的性能对比}}
+  \label{tab:itransformer_vs_transformer}
+  \vspace{5pt}
+  \centering
+  \begin{tabular}{c|c|cc|cc}
+    \toprule
+    \multirow{2}{*}{数据集}  & Prediction & \multicolumn{2}{c|}{iTransformer} & \multicolumn{2}{c|}{Transformer}                 \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6}
+                             & Length     & MSE                               & MAE                              & MSE   & MAE   \\
+    \midrule
+    \multirow{5}{*}{Weather} & 96         & \textbf{0.174}                    & \textbf{0.214}                   & 0.463 & 0.478 \\
+                             & 192        & \textbf{0.221}                    & \textbf{0.254}                   & 0.659 & 0.609 \\
+                             & 336        & \textbf{0.278}                    & \textbf{0.296}                   & 0.755 & 0.629 \\
+                             & 720        & \textbf{0.358}                    & \textbf{0.349}                   & 1.032 & 0.765 \\
+    \cmidrule(lr){2-6}
+                             & Avg        & \textbf{0.258}                    & \textbf{0.279}                   & 0.727 & 0.620 \\
+    \bottomrule
+    \bottomrule
+  \end{tabular}
+\end{table}
 
+\newpage
 \subsection{不同超参对模型效果的影响}
-我们以Weather数据集下输入96长度序列并输出96长度预测序列的任务为基准任务，以表\ref{tab:hyperparams}中的超参为基准，对各个超参进行了测试，测试结果如表\ref{tab:hyperparams_test}所示：
-
+我们以Weather数据集下输入96长度序列并输出96长度预测序列的任务为基准任务，以表\ref{tab:hyperparams}中的超参为基准，对token大小（固定FFN维度与token大小相同）、Encoder层数、输入序列长度这三个超参进行了测试，测试结果如表\ref{tab:hyperparams_test}所示：
+\begin{table}[htbp]
+  \caption{\small{不同token大小（固定FFN维度与token大小相同）、Encoder层数、输入序列长度对模型效果的影响（我们以Weather数据集下输入96长度序列并输出96长度预测序列的任务为基准任务，以表\ref{tab:hyperparams}中的超参为基准）}}
+  \label{tab:hyperparams_test}
+  \vspace{5pt}
+  \centering
+  \begin{tabular}{c|cc}
+    \toprule
+    \multirow{2}{*}{token大小} & \multicolumn{2}{c}{结果}                  \\
+    \cmidrule(lr){2-3}
+                               & MSE                      & MAE            \\
+    \midrule
+    128                        & 0.183                    & 0.224          \\
+    256                        & 0.178                    & 0.219          \\
+    512                        & 0.176                    & 0.216          \\
+    1024                       & \textbf{0.174}           & \textbf{0.212} \\
+    2048                       & 0.202                    & 0.239          \\
+    \bottomrule
+  \end{tabular}
+  \\
+  \vspace{5pt}
+  \centering
+  \begin{tabular}{c|cc}
+    \toprule
+    \multirow{2}{*}{Encoder层数} & \multicolumn{2}{c}{结果（按精确数进行比较）}                  \\
+    \cmidrule(lr){2-3}
+                                 & MSE                                          & MAE            \\
+    \midrule
+    1                            & 0.183                                        & 0.222          \\
+    2                            & 0.177                                        & 0.217          \\
+    3                            & 0.176                                        & 0.216          \\
+    4                            & 0.174                                        & \textbf{0.215} \\
+    5                            & \textbf{0.174}                               & 0.215          \\
+    \bottomrule
+  \end{tabular}
+  \\
+  \vspace{5pt}
+  \centering
+  \begin{tabular}{c|cc}
+    \toprule
+    \multirow{2}{*}{输入序列长度} & \multicolumn{2}{c}{结果}                  \\
+    \cmidrule(lr){2-3}
+                                  & MSE                      & MAE            \\
+    \midrule
+    48                            & 0.204                    & 0.235          \\
+    96                            & 0.176                    & 0.216          \\
+    192                           & 0.169                    & 0.216          \\
+    336                           & \textbf{0.163}           & \textbf{0.213} \\
+    720                           & 0.180                    & 0.232          \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
 \subsection{对优化效率的iFlashTransformer的测试}
 
