@@ -125,6 +125,7 @@
 \begin{itemize}
   \item script: 用于运行训练和测试的脚本，其中定义好了论文里的各个实验的脚本代码，特别是提供了合适的训练参数，可以直接运行。
   \item \verb |run.py|：整个程序的入口，用于接收命令行参数，并根据命令行参数，选择合适的实验类（是否是测试从部分变量的序列预测出全部变量的序列的实验），初始化后调用其训练、测试或预测函数，完成该次实验内容。
+  \item experiments: 用于定义各个实验类的初始化、训练、测试、预测逻辑。
   \item model: 里面定义了Transformer, iTransformer，以及Transformer变体（包括Reformer~\citep{kitaev2020reformer}, Informer~\citep{Informer}, Flowformer~\citep{wu2022flowformer}, Flashformer~\citep{dao2022flashattention}）及其inverted版本。
   \item layers: 包含上述模型中的各个子模块，如attention及其各种改型, FFN, encoder, decoder, embedding (含原版的embedding方案和inverted的方案)等。
   \item data\_provider: 用于根据实验配置信息，读取各个数据集的数据，并提供相应的Data Loader。
@@ -302,21 +303,21 @@
         \toprule
         \multirow{2}{*}{Models}                                  & Prediction & \multicolumn{2}{c|}{ETTm1} & \multicolumn{2}{c|}{ETTm2} & \multicolumn{2}{c|}{ETTh1} & \multicolumn{2}{c}{ETTh2}                                 \\
         \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10}
-                                                                 & Length     & MSE                        & MAE                        & MSE                        & MAE                        & MSE   & MAE   & MSE   & MAE   \\
+                                                                 & Length     & MSE                        & MAE                        & MSE                        & MAE                       & MSE   & MAE   & MSE   & MAE   \\
         \midrule
-        \multirow{5}{*}{\textbf{iTransformer (Our Replication)}} & 96         & 0.342                      & 0.377                      & 0.186                      & 0.272                      & 0.387 & 0.405 & 0.301 & 0.350 \\
-                                                                 & 192        & 0.383                      & 0.396                      & 0.254                      & 0.314                      & 0.441 & 0.436 & 0.380 & 0.399 \\
-                                                                 & 336        & 0.418                      & 0.418                      & 0.316                      & 0.351                      & 0.491 & 0.462 & 0.424 & 0.432 \\
-                                                                 & 720        & 0.487                      & 0.457                      & 0.414                      & 0.407                      & 0.509 & 0.494 & 0.430 & 0.447 \\
+        \multirow{5}{*}{\textbf{iTransformer (Our Replication)}} & 96         & 0.342                      & 0.377                      & 0.186                      & 0.272                     & 0.387 & 0.405 & 0.301 & 0.350 \\
+                                                                 & 192        & 0.383                      & 0.396                      & 0.254                      & 0.314                     & 0.441 & 0.436 & 0.380 & 0.399 \\
+                                                                 & 336        & 0.418                      & 0.418                      & 0.316                      & 0.351                     & 0.491 & 0.462 & 0.424 & 0.432 \\
+                                                                 & 720        & 0.487                      & 0.457                      & 0.414                      & 0.407                     & 0.509 & 0.494 & 0.430 & 0.447 \\
         \cmidrule(lr){2-10}
-                                                                 & Avg        & 0.408                      & 0.412                      & 0.293                      & 0.336                      & 0.457 & 0.449 & 0.384 & 0.407 \\
+                                                                 & Avg        & 0.408                      & 0.412                      & 0.293                      & 0.336                     & 0.457 & 0.449 & 0.384 & 0.407 \\
         \midrule
-        \multirow{5}{*}{\textbf{iTransformer}}                   & 96         & 0.334                      & 0.368                      & 0.180                      & 0.264                      & 0.386 & 0.405 & 0.297 & 0.349 \\
-                                                                 & 192        & 0.377                      & 0.391                      & 0.250                      & 0.309                      & 0.441 & 0.436 & 0.380 & 0.400 \\
-                                                                 & 336        & 0.426                      & 0.420                      & 0.311                      & 0.348                      & 0.487 & 0.458 & 0.428 & 0.432 \\
-                                                                 & 720        & 0.491                      & 0.459                      & 0.412                      & 0.407                      & 0.503 & 0.491 & 0.427 & 0.445 \\
+        \multirow{5}{*}{\textbf{iTransformer}}                   & 96         & 0.334                      & 0.368                      & 0.180                      & 0.264                     & 0.386 & 0.405 & 0.297 & 0.349 \\
+                                                                 & 192        & 0.377                      & 0.391                      & 0.250                      & 0.309                     & 0.441 & 0.436 & 0.380 & 0.400 \\
+                                                                 & 336        & 0.426                      & 0.420                      & 0.311                      & 0.348                     & 0.487 & 0.458 & 0.428 & 0.432 \\
+                                                                 & 720        & 0.491                      & 0.459                      & 0.412                      & 0.407                     & 0.503 & 0.491 & 0.427 & 0.445 \\
         \cmidrule(lr){2-10}
-                                                                 & Avg        & 0.407                      & 0.410                      & 0.288                      & 0.332                      & 0.454 & 0.447 & 0.383 & 0.407 \\
+                                                                 & Avg        & 0.407                      & 0.410                      & 0.288                      & 0.332                     & 0.454 & 0.447 & 0.383 & 0.407 \\
         \bottomrule
       \end{tabular}
     \end{small}
@@ -330,21 +331,21 @@
         \toprule
         \multirow{2}{*}{Models}                                  & Prediction & \multicolumn{2}{c|}{PEMS03} & \multicolumn{2}{c|}{PEMS04} & \multicolumn{2}{c|}{PEMS07} & \multicolumn{2}{c}{PEMS08}                                 \\
         \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10}
-                                                                 & Length     & MSE                         & MAE                         & MSE                         & MAE                         & MSE   & MAE   & MSE   & MAE   \\
+                                                                 & Length     & MSE                         & MAE                         & MSE                         & MAE                        & MSE   & MAE   & MSE   & MAE   \\
         \midrule
-        \multirow{5}{*}{\textbf{iTransformer (Our Replication)}} & 12         & 0.068                       & 0.174                       & 0.080                       & 0.188                       & 0.067 & 0.165 & 0.088 & 0.193 \\
-                                                                 & 24         & 0.098                       & 0.209                       & 0.099                       & 0.212                       & 0.087 & 0.190 & 0.138 & 0.243 \\
-                                                                 & 48         & 0.167                       & 0.277                       & 0.129                       & 0.243                       & 1.047 & 0.864 & 0.262 & 0.296 \\
-                                                                 & 96         & 1.014                       & 0.780                       & 0.170                       & 0.281                       & 1.039 & 0.855 & 0.298 & 0.327 \\
+        \multirow{5}{*}{\textbf{iTransformer (Our Replication)}} & 12         & 0.068                       & 0.174                       & 0.080                       & 0.188                      & 0.067 & 0.165 & 0.088 & 0.193 \\
+                                                                 & 24         & 0.098                       & 0.209                       & 0.099                       & 0.212                      & 0.087 & 0.190 & 0.138 & 0.243 \\
+                                                                 & 48         & 0.167                       & 0.277                       & 0.129                       & 0.243                      & 1.047 & 0.864 & 0.262 & 0.296 \\
+                                                                 & 96         & 1.014                       & 0.780                       & 0.170                       & 0.281                      & 1.039 & 0.855 & 0.298 & 0.327 \\
         \cmidrule(lr){2-10}
-                                                                 & Avg        & 0.337                       & 0.360                       & 0.120                       & 0.231                       & 0.560 & 0.519 & 0.197 & 0.265 \\
+                                                                 & Avg        & 0.337                       & 0.360                       & 0.120                       & 0.231                      & 0.560 & 0.519 & 0.197 & 0.265 \\
         \midrule
-        \multirow{5}{*}{\textbf{iTransformer}}                   & 12         & 0.071                       & 0.174                       & 0.078                       & 0.183                       & 0.067 & 0.165 & 0.079 & 0.182 \\
-                                                                 & 24         & 0.093                       & 0.201                       & 0.095                       & 0.205                       & 0.088 & 0.190 & 0.115 & 0.219 \\
-                                                                 & 48         & 0.125                       & 0.236                       & 0.120                       & 0.233                       & 0.110 & 0.215 & 0.186 & 0.235 \\
-                                                                 & 96         & 0.164                       & 0.275                       & 0.150                       & 0.262                       & 0.139 & 0.245 & 0.221 & 0.267 \\
+        \multirow{5}{*}{\textbf{iTransformer}}                   & 12         & 0.071                       & 0.174                       & 0.078                       & 0.183                      & 0.067 & 0.165 & 0.079 & 0.182 \\
+                                                                 & 24         & 0.093                       & 0.201                       & 0.095                       & 0.205                      & 0.088 & 0.190 & 0.115 & 0.219 \\
+                                                                 & 48         & 0.125                       & 0.236                       & 0.120                       & 0.233                      & 0.110 & 0.215 & 0.186 & 0.235 \\
+                                                                 & 96         & 0.164                       & 0.275                       & 0.150                       & 0.262                      & 0.139 & 0.245 & 0.221 & 0.267 \\
         \cmidrule(lr){2-10}
-                                                                 & Avg        & 0.113                       & 0.221                       & 0.111                       & 0.221                       & 0.101 & 0.204 & 0.150 & 0.226 \\
+                                                                 & Avg        & 0.113                       & 0.221                       & 0.111                       & 0.221                      & 0.101 & 0.204 & 0.150 & 0.226 \\
         \bottomrule
       \end{tabular}
     \end{small}
@@ -364,11 +365,11 @@
     \toprule
     \multirow{2}{*}{组别} & \multicolumn{2}{c|}{旧结果} & \multicolumn{2}{c|}{新结果} & \multicolumn{2}{c}{原论文结果}                         \\
     \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
-                          & MSE                         & MAE                         & MSE                             & MAE   & MSE   & MAE   \\
+                          & MSE                         & MAE                         & MSE                            & MAE   & MSE   & MAE   \\
     \midrule
-    PEMS03-96             & 1.014                       & 0.780                       & 0.325                           & 0.407 & 0.164 & 0.275 \\
-    PEMS07-48             & 1.047                       & 0.864                       & 0.135                           & 0.239 & 0.110 & 0.215 \\
-    PEMS07-96             & 1.039                       & 0.855                       & 0.188                           & 0.290 & 0.139 & 0.245 \\
+    PEMS03-96             & 1.014                       & 0.780                       & 0.325                          & 0.407 & 0.164 & 0.275 \\
+    PEMS07-48             & 1.047                       & 0.864                       & 0.135                          & 0.239 & 0.110 & 0.215 \\
+    PEMS07-96             & 1.039                       & 0.855                       & 0.188                          & 0.290 & 0.139 & 0.245 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -385,14 +386,14 @@
     \toprule
     \multirow{2}{*}{数据集}  & Prediction & \multicolumn{2}{c|}{iTransformer} & \multicolumn{2}{c}{Transformer}                 \\
     \cmidrule(lr){3-4} \cmidrule(lr){5-6}
-                             & Length     & MSE                               & MAE                              & MSE   & MAE   \\
+                             & Length     & MSE                               & MAE                             & MSE   & MAE   \\
     \midrule
-    \multirow{5}{*}{Weather} & 96         & \textbf{0.174}                    & \textbf{0.214}                   & 0.463 & 0.478 \\
-                             & 192        & \textbf{0.221}                    & \textbf{0.254}                   & 0.659 & 0.609 \\
-                             & 336        & \textbf{0.278}                    & \textbf{0.296}                   & 0.755 & 0.629 \\
-                             & 720        & \textbf{0.358}                    & \textbf{0.349}                   & 1.032 & 0.765 \\
+    \multirow{5}{*}{Weather} & 96         & \textbf{0.174}                    & \textbf{0.214}                  & 0.463 & 0.478 \\
+                             & 192        & \textbf{0.221}                    & \textbf{0.254}                  & 0.659 & 0.609 \\
+                             & 336        & \textbf{0.278}                    & \textbf{0.296}                  & 0.755 & 0.629 \\
+                             & 720        & \textbf{0.358}                    & \textbf{0.349}                  & 1.032 & 0.765 \\
     \cmidrule(lr){2-6}
-                             & Avg        & \textbf{0.258}                    & \textbf{0.279}                   & 0.727 & 0.620 \\
+                             & Avg        & \textbf{0.258}                    & \textbf{0.279}                  & 0.727 & 0.620 \\
     \bottomrule
     \bottomrule
   \end{tabular}
@@ -462,20 +463,20 @@
   \centering
   \resizebox{\textwidth}{!}
   {
-  \begin{tabular}{c|c|ccc|ccc}
-    \toprule
-    \multirow{2}{*}{数据集}  & Prediction & \multicolumn{3}{c|}{iTransformer} & \multicolumn{3}{c}{iFlashTransformer}                                                   \\
-    \cmidrule(lr){3-4} \cmidrule(lr){5-6}
-                             & Length     & MSE                               & MAE                                   & 训练时长/epoch & MSE   & MAE   & 训练时长/epoch \\
-    \midrule
-    \multirow{5}{*}{Weather} & 96         & \textbf{0.174}                    & \textbf{0.214}                        & 34s            & 0.181 & 0.222 & \textbf{13s}   \\
-                             & 192        & \textbf{0.221}                    & \textbf{0.254}                        & 36s            & 0.228 & 0.260 & \textbf{14s}   \\
-                             & 336        & \textbf{0.278}                    & \textbf{0.296}                        & 41s            & 0.283 & 0.300 & \textbf{14s}   \\
-                             & 720        & \textbf{0.358}                    & \textbf{0.349}                        & 45s            & 0.360 & 0.351 & \textbf{15s}   \\
-    \cmidrule(lr){2-6}
-                             & Avg        & \textbf{0.258}                    & \textbf{0.279}                        & 39s            & 0.263 & 0.283 & \textbf{14s}   \\
-    \bottomrule
-  \end{tabular}
+    \begin{tabular}{c|c|ccc|ccc}
+      \toprule
+      \multirow{2}{*}{数据集}  & Prediction & \multicolumn{3}{c|}{iTransformer} & \multicolumn{3}{c}{iFlashTransformer}                                                   \\
+      \cmidrule(lr){3-4} \cmidrule(lr){5-6}
+                               & Length     & MSE                               & MAE                                   & 训练时长/epoch & MSE   & MAE   & 训练时长/epoch \\
+      \midrule
+      \multirow{5}{*}{Weather} & 96         & \textbf{0.174}                    & \textbf{0.214}                        & 34s            & 0.181 & 0.222 & \textbf{13s}   \\
+                               & 192        & \textbf{0.221}                    & \textbf{0.254}                        & 36s            & 0.228 & 0.260 & \textbf{14s}   \\
+                               & 336        & \textbf{0.278}                    & \textbf{0.296}                        & 41s            & 0.283 & 0.300 & \textbf{14s}   \\
+                               & 720        & \textbf{0.358}                    & \textbf{0.349}                        & 45s            & 0.360 & 0.351 & \textbf{15s}   \\
+      \cmidrule(lr){2-6}
+                               & Avg        & \textbf{0.258}                    & \textbf{0.279}                        & 39s            & 0.263 & 0.283 & \textbf{14s}   \\
+      \bottomrule
+    \end{tabular}
   }
 \end{table}
 

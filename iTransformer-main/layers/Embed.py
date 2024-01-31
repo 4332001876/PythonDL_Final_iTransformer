@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import math
+import numpy as np
 
 
 class PositionalEmbedding(nn.Module):
@@ -141,3 +142,160 @@ class DataEmbedding_inverted(nn.Module):
         # x: [Batch Variate d_model]
         return self.dropout(x)
 
+class DataEmbeddingConv_inverted(nn.Module):
+    def __init__(self, c_in, d_model, embed_type='fixed', freq='h', dropout=0.1):
+        super(DataEmbeddingConv_inverted, self).__init__()
+        self.value_embedding = Resnet(c_in, d_model)
+        self.dropout = nn.Dropout(p=dropout)
+
+    def forward(self, x, x_mark):
+        x = x.permute(0, 2, 1)
+        # x: [Batch Variate Time]
+        if x_mark is None:
+            x = self.value_embedding(x)
+        else:
+            # the potential to take covariates (e.g. timestamps) as tokens
+            x = self.value_embedding(torch.cat([x, x_mark.permute(0, 2, 1)], 1)) 
+        # x: [Batch Variate d_model]
+        return self.dropout(x)
+
+class SiLU(nn.Module):
+    """export-friendly version of nn.SiLU()"""
+
+    @staticmethod
+    def forward(x):
+        return x * torch.sigmoid(x)
+
+
+def get_activation(name="silu", inplace=True):
+    if name == "silu":
+        module = nn.SiLU(inplace=inplace)
+    elif name == "relu":
+        module = nn.ReLU(inplace=inplace)
+    elif name == "lrelu":
+        module = nn.LeakyReLU(0.1, inplace=inplace)
+    else:
+        raise AttributeError("Unsupported act type: {}".format(name))
+    return module
+
+
+class BaseConv(nn.Module):
+    """A Conv2d -> Batchnorm -> silu/leaky relu block"""
+
+    def __init__(
+        self, in_channels, out_channels, ksize, stride, groups=1, bias=False, act="silu"
+    ):
+        super().__init__()
+        # same padding
+        pad = (ksize - 1) // 2
+        self.conv = nn.Conv1d(
+            in_channels,
+            out_channels,
+            kernel_size=ksize,
+            stride=stride,
+            padding=pad,
+            groups=groups,
+            bias=bias,
+        )
+        self.bn = nn.BatchNorm1d(out_channels)
+        self.act = get_activation(act, inplace=True)
+
+    def forward(self, x):
+        return self.act(self.bn(self.conv(x)))
+
+    def fuseforward(self, x):
+        return self.act(self.conv(x))
+
+class DWConv(nn.Module):
+    """Depthwise Conv + Conv"""
+
+    def __init__(self, in_channels, out_channels, ksize, stride=1, act="silu"):
+        super().__init__()
+        self.dconv = BaseConv(
+            in_channels,
+            in_channels,
+            ksize=ksize,
+            stride=stride,
+            groups=in_channels,
+            act=act,
+        )
+        self.pconv = BaseConv(
+            in_channels, out_channels, ksize=1, stride=1, groups=1, act=act
+        )
+
+    def forward(self, x):
+        x = self.dconv(x)
+        return self.pconv(x)
+
+
+class Bottleneck(nn.Module):
+    # Standard bottleneck
+    def __init__(
+        self,
+        in_channels,
+        out_channels,
+        shortcut=True,
+        expansion=0.5,
+        depthwise=False,
+        act="silu",
+    ):
+        super().__init__()
+        hidden_channels = int(out_channels * expansion)
+        Conv = DWConv if depthwise else BaseConv
+        self.conv1 = BaseConv(in_channels, hidden_channels, 1, stride=1, act=act)
+        self.conv2 = Conv(hidden_channels, out_channels, 3, stride=1, act=act)
+        self.use_add = shortcut and in_channels == out_channels
+
+    def forward(self, x):
+        y = self.conv2(self.conv1(x))
+        if self.use_add:
+            y = y + x
+        return y
+
+class ConvBlock(nn.Module):
+    def __init__(self, in_channel, out_channel) -> None:
+        super().__init__()
+        # self.bottleneck = Bottleneck(in_channel, in_channel)
+        self.conv = BaseConv(in_channel, out_channel, 3, stride=1, groups=in_channel)
+        self.pool = nn.AvgPool1d(2)
+    
+    def forward(self, x):
+        # x = self.bottleneck(x)
+        x = self.conv(x)
+        x = self.pool(x)
+        return x
+
+class Resnet(nn.Module):
+    def __init__(self, c_in, d_model) -> None:
+        # c_in: seq_len
+        super().__init__()
+        self.c_in = c_in
+        self.d_model = d_model
+
+        self.variate_num = 1
+        self.module_list = [ConvBlock(1, 1) for _ in range(int(np.log2(c_in)))]
+
+        feature_map_size = c_in
+        out_size = c_in
+        for _ in range(int(np.log2(c_in))):
+            out_size = out_size // 2
+            feature_map_size += out_size
+
+        self.linear = nn.Linear(feature_map_size, d_model)
+
+    def forward(self, x):
+        # x: [Batch Variate Time]
+        if x.shape[1] != self.variate_num:
+            self.variate_num = x.shape[1]
+            self.module_list = [ConvBlock(self.variate_num, self.variate_num) for _ in range(int(np.log2(self.c_in)))]
+
+        x_list = [x]
+        feature = x
+        for module in self.module_list:
+            feature = module(feature)
+            x_list.append(feature)
+
+        x = torch.cat(x_list, dim=2)
+        # x: [Batch Variate Feature_map_size]
+        x = self.linear(x)
+        return x
