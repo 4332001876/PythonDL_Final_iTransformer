@@ -388,12 +388,12 @@
     \cmidrule(lr){3-4} \cmidrule(lr){5-6}
                              & Length     & MSE                               & MAE                             & MSE   & MAE   \\
     \midrule
-    \multirow{5}{*}{Weather} & 96         & \textbf{0.174}                    & \textbf{0.214}                  & 0.463 & 0.478 \\
-                             & 192        & \textbf{0.221}                    & \textbf{0.254}                  & 0.659 & 0.609 \\
-                             & 336        & \textbf{0.278}                    & \textbf{0.296}                  & 0.755 & 0.629 \\
-                             & 720        & \textbf{0.358}                    & \textbf{0.349}                  & 1.032 & 0.765 \\
+    \multirow{5}{*}{Weather} & 96         & \textbf{0.176}                    & \textbf{0.216}                  & 0.463 & 0.478 \\
+                             & 192        & \textbf{0.225}                    & \textbf{0.257}                  & 0.659 & 0.609 \\
+                             & 336        & \textbf{0.281}                    & \textbf{0.299}                  & 0.755 & 0.629 \\
+                             & 720        & \textbf{0.358}                    & \textbf{0.350}                  & 1.032 & 0.765 \\
     \cmidrule(lr){2-6}
-                             & Avg        & \textbf{0.258}                    & \textbf{0.279}                  & 0.727 & 0.620 \\
+                             & Avg        & \textbf{0.260}                    & \textbf{0.281}                  & 0.727 & 0.620 \\
     \bottomrule
     \bottomrule
   \end{tabular}
@@ -434,6 +434,7 @@
     3                            & 0.176                                        & 0.216          \\
     4                            & 0.174                                        & \textbf{0.215} \\
     5                            & \textbf{0.174}                               & 0.215          \\
+    6                            & 0.181                                        & 0.224          \\
     \bottomrule
   \end{tabular}
   \\
@@ -480,9 +481,60 @@
   }
 \end{table}
 
-% \section{探索性修改}
+\section{探索性修改}
 % (非必须，奖励分) 对代码进行了探索性修改，描述修改经过，并报告实验结果   （5分）
 
+我们向iTransformer中加入了时间序列分析中常用的decomposition优化（如图\ref{fig:decomposition}所示），将原始时间序列分解为趋势项和残差项，然后分别处理趋势项和残差项，并预测趋势项和残差项，最终将预测的趋势项和残差项加和起来得到最终预测序列。
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.5\textwidth]{./pic/decomposition.png}
+  \caption{\small{decomposition优化示意图}}
+  \label{fig:decomposition}
+\end{figure}
+
+我们继续在Weather数据集上进行测试，我们保证除Encoder层数外的超参与\ref{tab:hyperparams}相同，由于decomposition的模型带两个Encoder，为了参数量的公平起见，我们在进行对比实验时，只允许带decomposition的模型拥有对应组别里原版iTransformer模型的一半Encoder层数。测试结果如表\ref{tab:result_decomposition}所示：
+\begin{table}[htbp]
+  \caption{\small{加入decomposition优化后的结果与原论文结果对比（预测序列长度固定为96，取三组Encoder层数设置，结果按精确数进行比较）}}
+  \label{tab:result_decomposition}
+  \vspace{5pt}
+  \centering
+  \begin{tabular}{c|cc|c|cc}
+    \toprule
+    decomposition模型 & \multicolumn{2}{c|}{decomposition模型结果} & iTransformer   & \multicolumn{2}{c}{iTransformer结果}                                   \\
+    \cmidrule(lr){2-3} \cmidrule(lr){5-6}
+    Encoder层数       & MSE                                        & MAE            & Encoder层数                          & MSE            & MAE            \\
+    \midrule
+    1                 & 0.179                                      & 0.219          & 2                                    & \textbf{0.177} & \textbf{0.217} \\
+    2                 & \textbf{0.174}                             & \textbf{0.214} & 4                                    & 0.174          & 0.215          \\
+    3                 & \textbf{0.172}                             & \textbf{0.211} & 6                                    & 0.181          & 0.224          \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+可以看到，在Encoder层数稍大之后，decomposition模型的参数性价比开始明显高于原模型，其可扩展性也更好，能提高模型的性能上限，这一优化是成功的。
+
+使用decomposition优化后，我们在Weather数据集上能得到的最优结果如下：
+
+\begin{table}[htbp]
+  \caption{\small{在Weather数据集上预测序列长度为96时取得的最优结果（其中限制输入长度的组别采用了2层Encoder，1024的Token维度，2048的FFN维度；不限输入长度的组采用了336的输入长度，2层Encoder，512的Token维度，2048的FFN维度）}}
+  \label{tab:result_best}
+  \vspace{5pt}
+  \centering
+  \begin{tabular}{c|cc|cc|cc}
+    \toprule
+    \multirow{2}{*}{组别}                 & \multicolumn{2}{c}{结果}         \\
+    \cmidrule(lr){2-3}
+                                          & MSE                      & MAE   \\
+    \midrule
+    原论文                                & 0.174                    & 0.214 \\
+    decomposition优化后，限制输入长度为96 & 0.171                    & 0.211 \\
+    decomposition优化后，不限输入长度     & 0.163                    & 0.215 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+除了这个成功的方案，我们还有过一些失败的修改方案，比如将序列转token的编码器从一个线性层换为卷积编码器，但是替换后模型性能下降了，MSE为0.181，MAE为0.221，因此没有采用。
 
 \section{感想}
 % 复现过程中的感悟、吐槽  （300-1000字） （5分）

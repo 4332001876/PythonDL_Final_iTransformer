@@ -216,7 +216,7 @@ class DWConv(nn.Module):
             in_channels,
             ksize=ksize,
             stride=stride,
-            groups=in_channels,
+            groups=1,
             act=act,
         )
         self.pconv = BaseConv(
@@ -255,12 +255,15 @@ class Bottleneck(nn.Module):
 class ConvBlock(nn.Module):
     def __init__(self, in_channel, out_channel) -> None:
         super().__init__()
-        # self.bottleneck = Bottleneck(in_channel, in_channel)
-        self.conv = BaseConv(in_channel, out_channel, 3, stride=1, groups=in_channel)
+        if in_channel> 1:
+            self.bottleneck = Bottleneck(in_channel, in_channel)
+        else:
+            self.bottleneck = nn.Identity()
+        self.conv = BaseConv(in_channel, out_channel, 3, stride=1, groups=1)
         self.pool = nn.AvgPool1d(2)
     
     def forward(self, x):
-        # x = self.bottleneck(x)
+        x = self.bottleneck(x)
         x = self.conv(x)
         x = self.pool(x)
         return x
@@ -272,30 +275,27 @@ class Resnet(nn.Module):
         self.c_in = c_in
         self.d_model = d_model
 
-        self.variate_num = 1
-        self.module_list = [ConvBlock(1, 1) for _ in range(int(np.log2(c_in)))]
+        self.module_list = []
 
-        feature_map_size = c_in
+        channel_num = 1
         out_size = c_in
-        for _ in range(int(np.log2(c_in))):
+        for _ in range(int(np.log2(c_in))-1):
             out_size = out_size // 2
-            feature_map_size += out_size
+            self.module_list.append(ConvBlock(channel_num, 2*channel_num))
+            channel_num *= 2
 
-        self.linear = nn.Linear(feature_map_size, d_model)
+        self.conv = nn.Sequential(*self.module_list)
+        self.linear_input_size = channel_num*out_size
+        self.linear = nn.Linear(self.linear_input_size, d_model)
 
     def forward(self, x):
         # x: [Batch Variate Time]
-        if x.shape[1] != self.variate_num:
-            self.variate_num = x.shape[1]
-            self.module_list = [ConvBlock(self.variate_num, self.variate_num) for _ in range(int(np.log2(self.c_in)))]
-
-        x_list = [x]
-        feature = x
-        for module in self.module_list:
-            feature = module(feature)
-            x_list.append(feature)
-
-        x = torch.cat(x_list, dim=2)
-        # x: [Batch Variate Feature_map_size]
+        variate_num = x.shape[1]
+        x = x.reshape(-1, 1, self.c_in)
+        # x: [Batch*Variate 1 Time]
+        x = self.conv(x)
+        # x: [Batch*Variate Channel_num out_size]
+        x = x.reshape(-1, variate_num, self.linear_input_size)
+        # x: [Batch Variate Channel_num*out_size]
         x = self.linear(x)
         return x
