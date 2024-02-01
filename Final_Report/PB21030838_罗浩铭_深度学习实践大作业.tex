@@ -214,7 +214,7 @@
     \bottomrule
   \end{tabular}
 \end{table}
-由于Weather数据集较小，因此我们选用的Encoder层数仅为2，由于时间序列预测任务不需要很复杂的Decoder，因此Decoder层数仅为1。Encoder, Decoder输入变量数以及输出变量数与数据集保持一致即可。Token维度和FFN维度的设置默认如上。由于Weather数据集较小，单卡可以支持128的BatchSize，Epoch数为10，此类较大的模型学习率一般都设为0.0001。
+由于Weather数据集较小，因此我们选用的Encoder层数仅为3，由于时间序列预测任务不需要很复杂的Decoder，因此Decoder层数仅为1。Encoder, Decoder输入变量数以及输出变量数与数据集保持一致即可。Token维度和FFN维度的设置默认如表\ref{tab:hyperparams}。由于Weather数据集较小，单卡可以支持128的BatchSize，Epoch数为10，此类较大的模型学习率一般都设为0.0001。
 
 我们以Traffic数据集下输入96长度序列并输出96长度预测序列的任务为例（因其未早停），来展示典型的训练过程中的每个epoch的loss曲线（见图\ref{fig:loss}）：
 \begin{figure}[htbp]
@@ -400,6 +400,8 @@
   \end{tabular}
 \end{table}
 
+可以看到iTransformer的性能远超Transformer，这充分说明了iTransformer的设计确实有效。
+
 \subsection{不同超参对模型效果的影响}
 我们以Weather数据集下输入96长度序列并输出96长度预测序列的任务为基准任务，以表\ref{tab:hyperparams}中的超参为基准，对token大小（固定FFN维度与token大小相同）、Encoder层数、输入序列长度这三个超参进行了测试，测试结果如表\ref{tab:hyperparams_test}所示：
 \begin{table}[htbp]
@@ -455,6 +457,8 @@
   \end{tabular}
 \end{table}
 
+可以看到，这三个参数都适合调得稍大，但都不能过大，否则会因为动力学等方面的不稳定性，导致模型的性能下降。
+
 \subsection{对优化效率的iFlashTransformer的测试}
 我们对比了iTransformer与iFlashTransformer的性能和效率，测试结果如表\ref{tab:itransformer_vs_iflashtransformer}所示：
 \begin{table}[htbp]
@@ -480,6 +484,8 @@
     \end{tabular}
   }
 \end{table}
+
+可以看到，iFlashTransformer的性能只是略微低于iTransformer，但训练时长却缩短了超过一半，这说明iFlashTransformer的设计确实有效。
 
 \newpage
 \section{探索性修改}
@@ -515,7 +521,7 @@
 
 可以看到，在Encoder层数稍大之后，decomposition模型的参数性价比开始明显高于原模型，其可扩展性也更好，能提高模型的性能上限，这一优化是成功的。
 
-使用decomposition优化后，我们在Weather数据集上能得到的最优结果如下：
+使用decomposition优化后，我们在Weather数据集上能得到的最优结果如表\ref{tab:result_best}所示：
 
 \begin{table}[htbp]
   \caption{在Weather数据集上预测序列长度为96时取得的最优结果（其中限制输入长度的组别采用了2层Encoder，1024的Token维度，2048的FFN维度；不限输入长度的组采用了336的输入长度，2层Encoder，512的Token维度，2048的FFN维度）}
