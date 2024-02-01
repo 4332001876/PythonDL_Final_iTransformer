@@ -148,7 +148,8 @@
 \begin{table}[thbp]
   \centering
   \vspace{0pt}
-  \caption{\small{数据集描述，\emph{Dim}代表时间序列变量数，\emph{Dataset Size}以 (Train, Validation, Test)的形式表示，\emph{Prediction Length}表示各预测序列长度的设定，\emph{Frequency} 表示时间序列的采样时间间隔}\label{tab:dataset}}
+  \caption{数据集描述，\emph{Dim}代表时间序列变量数，\emph{Dataset Size}以 (Train, Validation, Test)的形式表示，\emph{Prediction Length}表示各预测序列长度的设定，\emph{Frequency} 表示时间序列的采样时间间隔}
+  \label{tab:dataset}
   \vskip 0.15in
   \resizebox{\textwidth}{!}
   {
@@ -191,7 +192,7 @@
 
 我们以Weather数据集下输入96长度序列并输出96长度预测序列的任务为例（见表\ref{tab:hyperparams}）介绍我们训练时用的超参：
 \begin{table}[htbp]
-  \caption{\small{典型的训练超参设置（以Weather数据集下输入96长度序列并输出96长度预测序列的任务为例）}}
+  \caption{典型的训练超参设置（以Weather数据集下输入96长度序列并输出96长度预测序列的任务为例）}
   \label{tab:hyperparams}
   \vspace{5pt}
   \centering
@@ -219,7 +220,7 @@
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.8\textwidth]{./pic/loss_plot.png}
-  \caption{\small{典型的训练过程中的loss曲线（以Traffic数据集下输入96长度序列并输出96长度预测序列的任务为例）}}
+  \caption{典型的训练过程中的loss曲线（以Traffic数据集下输入96长度序列并输出96长度预测序列的任务为例）}
   \label{fig:loss}
 \end{figure}
 
@@ -227,7 +228,7 @@
 
 在各个数据集中，取预测长度为96时（预测长度对训练时长有少许影响，但非主要因素），每个epoch的训练时长如表\ref{tab:time}所示：
 \begin{table}[htbp]
-  \caption{\small{各数据集下预测长度为96时每个epoch的训练时长}}
+  \caption{各数据集下预测长度为96时每个epoch的训练时长}
   \label{tab:time}
   \vspace{5pt}
   \centering
@@ -262,7 +263,7 @@
 \newpage
 
 \begin{table}[htbp]
-  \caption{\small{复现结果与原论文结果对比（平均结果指四种预测长度的结果取平均）}}
+  \caption{复现结果与原论文结果对比（平均结果指四种预测长度的结果取平均）}
   \label{tab:result}
   \vspace{5pt}
   \centering
@@ -357,7 +358,7 @@
 进一步检验，我们发现，脚本中所给的PEMS数据集的训练参数中，学习率大都异常地高，上述预测误差异常的组别，无一例外都采用了默认值5倍或10倍的学习率。将学习率调回默认值0.0001后，我们对上述的梯度爆炸的三个组别重新训练，得到的结果如表\ref{tab:result_fix}所示：
 
 \begin{table}[htbp]
-  \caption{\small{对梯度爆炸的组别以默认学习率0.0001进行重新训练得到的结果}}
+  \caption{对梯度爆炸的组别以默认学习率0.0001进行重新训练得到的结果}
   \label{tab:result_fix}
   \vspace{5pt}
   \centering
@@ -378,7 +379,7 @@
 \subsection{iTransformer与Transformer的性能对比}
 我们对比了iTransformer与Transformer的性能，测试结果如表\ref{tab:itransformer_vs_transformer}所示：
 \begin{table}[htbp]
-  \caption{\small{iTransformer与Transformer的性能对比}}
+  \caption{iTransformer与Transformer的性能对比}
   \label{tab:itransformer_vs_transformer}
   \vspace{5pt}
   \centering
@@ -399,11 +400,10 @@
   \end{tabular}
 \end{table}
 
-\newpage
 \subsection{不同超参对模型效果的影响}
 我们以Weather数据集下输入96长度序列并输出96长度预测序列的任务为基准任务，以表\ref{tab:hyperparams}中的超参为基准，对token大小（固定FFN维度与token大小相同）、Encoder层数、输入序列长度这三个超参进行了测试，测试结果如表\ref{tab:hyperparams_test}所示：
 \begin{table}[htbp]
-  \caption{\small{不同token大小（固定FFN维度与token大小相同）、Encoder层数、输入序列长度对模型效果的影响（我们以Weather数据集下输入96长度序列并输出96长度预测序列的任务为基准任务，以表\ref{tab:hyperparams}中的超参为基准）}}
+  \caption{不同token大小（固定FFN维度与token大小相同）、Encoder层数、输入序列长度对模型效果的影响（我们以Weather数据集下输入96长度序列并输出96长度预测序列的任务为基准任务，以表\ref{tab:hyperparams}中的超参为基准）}
   \label{tab:hyperparams_test}
   \vspace{5pt}
   \centering
@@ -458,7 +458,7 @@
 \subsection{对优化效率的iFlashTransformer的测试}
 我们对比了iTransformer与iFlashTransformer的性能和效率，测试结果如表\ref{tab:itransformer_vs_iflashtransformer}所示：
 \begin{table}[htbp]
-  \caption{\small{iTransformer与iFlashTransformer的性能对比}}
+  \caption{iTransformer与iFlashTransformer的性能对比}
   \label{tab:itransformer_vs_iflashtransformer}
   \vspace{5pt}
   \centering
@@ -481,6 +481,7 @@
   }
 \end{table}
 
+\newpage
 \section{探索性修改}
 % (非必须，奖励分) 对代码进行了探索性修改，描述修改经过，并报告实验结果   （5分）
 
@@ -489,13 +490,13 @@
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.5\textwidth]{./pic/decomposition.png}
-  \caption{\small{decomposition优化示意图}}
+  \caption{decomposition优化示意图}
   \label{fig:decomposition}
 \end{figure}
 
-我们继续在Weather数据集上进行测试，我们保证除Encoder层数外的超参与\ref{tab:hyperparams}相同，由于decomposition的模型带两个Encoder，为了参数量的公平起见，我们在进行对比实验时，只允许带decomposition的模型拥有对应组别里原版iTransformer模型的一半Encoder层数。测试结果如表\ref{tab:result_decomposition}所示：
+我们继续在Weather数据集上进行测试，我们保证除Encoder层数外的超参与表\ref{tab:hyperparams}相同，由于decomposition的模型带两个Encoder，为了参数量的公平起见，我们在进行对比实验时，只允许带decomposition的模型拥有对应组别里原版iTransformer模型的一半Encoder层数。测试结果如表\ref{tab:result_decomposition}所示：
 \begin{table}[htbp]
-  \caption{\small{加入decomposition优化后的结果与原论文结果对比（预测序列长度固定为96，取三组Encoder层数设置，结果按精确数进行比较）}}
+  \caption{加入decomposition优化后的结果与原论文结果对比（预测序列长度固定为96，取三组Encoder层数设置，结果按精确数进行比较）}
   \label{tab:result_decomposition}
   \vspace{5pt}
   \centering
@@ -517,11 +518,11 @@
 使用decomposition优化后，我们在Weather数据集上能得到的最优结果如下：
 
 \begin{table}[htbp]
-  \caption{\small{在Weather数据集上预测序列长度为96时取得的最优结果（其中限制输入长度的组别采用了2层Encoder，1024的Token维度，2048的FFN维度；不限输入长度的组采用了336的输入长度，2层Encoder，512的Token维度，2048的FFN维度）}}
+  \caption{在Weather数据集上预测序列长度为96时取得的最优结果（其中限制输入长度的组别采用了2层Encoder，1024的Token维度，2048的FFN维度；不限输入长度的组采用了336的输入长度，2层Encoder，512的Token维度，2048的FFN维度）}
   \label{tab:result_best}
   \vspace{5pt}
   \centering
-  \begin{tabular}{c|cc|cc|cc}
+  \begin{tabular}{c|cc}
     \toprule
     \multirow{2}{*}{组别}                 & \multicolumn{2}{c}{结果}         \\
     \cmidrule(lr){2-3}
@@ -544,13 +545,15 @@
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.5\textwidth]{./pic/itransformer_公众号.jpg}
-  \caption{\small{2023年10月20日，我第一次在微信公众号接触到这篇文章}}
+  \caption{2023年10月20日，我第一次在微信公众号接触到这篇文章}
   \label{fig:wechat}
 \end{figure}
 
 正好这门课程的大作业就是复现论文，动工之前，我咨询了助教的意见，发现这是一篇在投的ICLR 2024的paper（毕竟论文还很新），不过已经在OpenReview上拿了3个8分和1个6分，基本确定能中，而且其官方仓库星星也很多，所以助教认为其符合顶会文章的作业要求，于是我也就决定了复现这篇论文。
 
-这篇论文的官方实现还是十分优美的，在各种软件工程规范都遵守得很好，所以跑实验的过程中体验非常好，iTransformer的效果实际跑出来也非常不错。当然，体验没有那么好的一点就是深度学习的工作都要跑大量组别的实验，前前后后跑了接近八十组实验，在百度和kaggle的免费算力上跑了差不多40多个小时，有几回还是半夜挂机训练，终于跑出了上面那些规模庞大的表格。这让我提前体会到了未来在AI科研领域工作的艰辛。
+这篇论文的官方实现十分优美，在各种软件工程规范上都遵守得很好，所以跑实验的体验非常好，iTransformer的效果实际跑出来也非常不错。当然，体验没有那么好的一点就是深度学习的工作都要跑大量组别的实验，前前后后跑了接近八十组实验，在百度和kaggle的免费算力上跑了差不多40多个小时，有几回还是半夜挂机训练，终于跑出了上面那些规模庞大的表格。这让我提前体会到了未来在AI科研领域工作的艰辛。
+
+这次作业中，最难能可贵的是我确实琢磨出了对这篇工作的优化方案，尽管只是从其他工作里揉过来的一点小改进，但看到它work的时候还是成就感满满。
 
 十分感谢这次大作业的契机，让我得以经手这篇优美的工作，提升了我在实验方面的能力。同时也感谢这门课程，让我接触了深度学习各领域的优秀工作，大幅深化了我对深度学习的理解，提高了我的工程能力。
 
